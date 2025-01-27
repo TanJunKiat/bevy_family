@@ -16,14 +16,9 @@
  *
 */
 // =========================================================================
-use super::*;
-
 #[derive(Clone, Debug)]
 pub enum Action {
     Create,
     Update,
     Delete,
 }
-
-#[derive(Component, Clone, Debug, PartialEq)]
-pub struct Identifier<T>(pub T);
