@@ -1,0 +1,16 @@
+
+# Change Log
+All notable changes to this project will be documented in this file.
+
+## [0.1.1] - 2024-01-27
+
+### Added
+    Added a lifetime feature
+    - Added a BioglocalTrait for lifetime specification
+    - Added a system to act as a garbage collector
+## [0.1.0] - 2024-01-27
+
+### Added
+    Released first version of bevy_family
+    - Allow easy creation, updating, and removal of parent-child components with events
+    - Using resource to keep track of history of events
