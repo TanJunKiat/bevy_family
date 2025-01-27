@@ -17,5 +17,5 @@
 */
 // =========================================================================
 pub trait BiologicalTrait {
-    fn get_lifetime(&self) -> &std::time::Duration;
+    fn get_lifetime(&self) -> std::time::Duration;
 }

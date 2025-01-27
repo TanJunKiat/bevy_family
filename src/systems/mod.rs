@@ -1,5 +1,3 @@
-use bevy::state::commands;
-
 // =========================================================================
 /*
  * Copyright (C) 2019 Tan Jun Kiat
@@ -237,7 +235,7 @@ pub fn refresh_lifetime<T, U>(
     U: Clone + PartialEq + Send + Sync + 'static,
 {
     for (entity, mut bioglical_clock, component, _) in queries.iter_mut() {
-        if component.get_lifetime() < &bioglical_clock.lifetime.elapsed() {
+        if component.get_lifetime() < bioglical_clock.lifetime.elapsed() {
             // Dark, but kills of all the children if the parent dies
             commands.entity(entity).despawn_recursive();
             info!("Entity died");

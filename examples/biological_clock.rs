@@ -24,8 +24,8 @@ use bevy_family::*;
 struct Building(std::time::Duration);
 
 impl BiologicalTrait for Building {
-    fn get_lifetime(&self) -> &std::time::Duration {
-        &self.0
+    fn get_lifetime(&self) -> std::time::Duration {
+        self.0
     }
 }
 
