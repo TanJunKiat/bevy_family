@@ -39,6 +39,7 @@ pub struct ChildEvent<T, U> {
 }
 
 /// History of the action that has been performed
+#[derive(PartialEq)]
 pub struct History<T> {
     pub action: Action,
     pub parent_identifier: Identifier<T>,
@@ -52,14 +53,22 @@ pub struct Lineage<T> {
     pub histories: Vec<History<T>>,
 }
 
-impl<T> Lineage<T> 
-where T: PartialEq
+impl<T> Lineage<T>
+where
+    T: Clone + PartialEq,
 {
     pub fn add_history(&mut self, history: History<T>) {
         self.histories.push(history);
     }
 
-    pub fn get_histories_by_parent_identifier(&self, parent_identifier: &Identifier<T>) -> Vec<&History<T>> {
+    pub fn remove_history(&mut self, history: History<T>) {
+        self.histories.retain(|h| h != &history);
+    }
+
+    pub fn get_histories_by_parent_identifier(
+        &self,
+        parent_identifier: &Identifier<T>,
+    ) -> Vec<&History<T>> {
         let mut histories = Vec::new();
         for history in &self.histories {
             if &history.parent_identifier == parent_identifier {
@@ -69,7 +78,10 @@ where T: PartialEq
         return histories;
     }
 
-    pub fn get_histories_by_child_identifier(&self, child_identifier: &Identifier<T>) -> Vec<&History<T>> {
+    pub fn get_histories_by_child_identifier(
+        &self,
+        child_identifier: &Identifier<T>,
+    ) -> Vec<&History<T>> {
         let mut histories = Vec::new();
         for history in &self.histories {
             if let Some(identifier) = &history.child_identifier {
@@ -79,6 +91,42 @@ where T: PartialEq
             }
         }
         return histories;
+    }
+
+    pub fn get_result_from_parent_identifier(
+        &self,
+        parent_identifier: &Identifier<T>,
+    ) -> Result<(), ()> {
+        for history in &self.histories {
+            if &history.parent_identifier == parent_identifier {
+                return history.result;
+            }
+        }
+        return Err(());
+    }
+
+    pub fn get_result_from_child_identifier(
+        &self,
+        child_identifier: &Identifier<T>,
+    ) -> Result<(), ()> {
+        for history in &self.histories {
+            if let Some(identifier) = &history.child_identifier {
+                if identifier == child_identifier {
+                    return history.result;
+                }
+            }
+        }
+        return Err(());
+    }
+
+    pub fn clear_parent_history(&mut self, parent_identifier: &Identifier<T>) {
+        self.histories
+            .retain(|h| &h.parent_identifier != parent_identifier);
+    }
+
+    pub fn clear_child_history(&mut self, child_identifier: &Identifier<T>) {
+        self.histories
+            .retain(|h| h.child_identifier != Some(child_identifier.clone()));
     }
 }
 
