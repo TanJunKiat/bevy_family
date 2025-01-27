@@ -34,3 +34,21 @@ where
     }
     return None;
 }
+
+/// Get the component by the identifier
+pub fn get_component_by_identifier<T, U>(
+    queries: &Query<(Entity, &mut T, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
+    identifier: &Identifier<U>,
+) -> Option<T>
+where
+    T: Component + Clone,
+    U: PartialEq + Send + Sync + 'static,
+{
+    for (_, component, id) in queries.iter() {
+        if id == identifier {
+            return Some(component.clone());
+        }
+    }
+    return None;
+}
+
