@@ -37,7 +37,7 @@ where
 
 /// Get the component by the identifier
 pub fn get_component_by_identifier<T, U>(
-    queries: &Query<(Entity, &mut T, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
+    queries: &Query<(Entity, &T, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
     identifier: &Identifier<U>,
 ) -> Option<T>
 where
