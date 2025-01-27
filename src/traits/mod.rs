@@ -16,35 +16,6 @@
  *
 */
 // =========================================================================
-use bevy::prelude::*;
-
-mod enums;
-mod functions;
-mod structs;
-mod systems;
-mod traits;
-
-pub use enums::*;
-pub use functions::*;
-pub use structs::*;
-pub use systems::*;
-pub use traits::*;
-
-use std::marker::PhantomData;
-
-/// Main Plugin for the Family Plugin
-///
-/// This plugin is used to initialize the Lineage resource
-#[derive(Default)]
-pub struct FamilyPlugin<T> {
-    _marker: PhantomData<T>,
-}
-
-impl<T> Plugin for FamilyPlugin<T>
-where
-    T: Default + Send + Sync + 'static,
-{
-    fn build(&self, app: &mut App) {
-        app.init_resource::<Lineage<T>>();
-    }
+pub trait BiologicalTrait {
+    fn get_lifetime(&self) -> &std::time::Duration;
 }

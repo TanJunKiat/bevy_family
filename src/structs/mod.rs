@@ -21,6 +21,11 @@ use super::*;
 #[derive(Component, Clone, Debug, PartialEq)]
 pub struct Identifier<T>(pub T);
 
+#[derive(Component, Default)]
+pub struct BiologicalClock {
+    pub lifetime: bevy::time::Stopwatch,
+}
+
 /// Event that is used to create, update and delete parent entities
 #[derive(Event)]
 pub struct ParentEvent<T, U> {

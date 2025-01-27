@@ -1,3 +1,5 @@
+use bevy::state::commands;
+
 // =========================================================================
 /*
  * Copyright (C) 2019 Tan Jun Kiat
@@ -41,9 +43,11 @@ pub fn cud_parent_component<T, U>(
                     lineage.add_history(history);
                 }
                 None => {
-                    commands
-                        .spawn(event.component.clone())
-                        .insert(event.self_identifier.clone());
+                    commands.spawn((
+                        event.component.clone(),
+                        event.self_identifier.clone(),
+                        BiologicalClock::default(),
+                    ));
                     info!("Entity created");
                     let history = History::new_parent_history(
                         event.action.clone(),
@@ -55,7 +59,8 @@ pub fn cud_parent_component<T, U>(
             },
             Action::Update => match get_entity_by_identifier(&queries, &event.self_identifier) {
                 Some(entity) => {
-                    let (_, mut component, _) = queries.get_mut(entity).unwrap();
+                    let (entity, mut component, _) = queries.get_mut(entity).unwrap();
+                    commands.entity(entity).insert(BiologicalClock::default());
                     *component = event.component.clone();
                     info!("Entity updated");
                     let history = History::new_parent_history(
@@ -144,8 +149,11 @@ pub fn cud_child_component<T, U, V>(
                     }
                     None => {
                         let child_id = commands
-                            .spawn(event.component.clone())
-                            .insert(event.self_identifier.clone())
+                            .spawn((
+                                event.component.clone(),
+                                event.self_identifier.clone(),
+                                BiologicalClock::default(),
+                            ))
                             .id();
                         commands.entity(parent_entity).add_child(child_id);
                         info!("Child entity created");
@@ -162,7 +170,9 @@ pub fn cud_child_component<T, U, V>(
             Action::Update => {
                 match get_entity_by_identifier(&child_queries, &event.self_identifier) {
                     Some(entity) => {
-                        let (_, mut component, _) = child_queries.get_mut(entity).unwrap();
+                        let (entity, mut component, _) = child_queries.get_mut(entity).unwrap();
+                        // refresh the biological clock
+                        commands.entity(entity).insert(BiologicalClock::default());
                         *component = event.component.clone();
                         info!("Entity updated");
                         let history = History::new_child_history(
@@ -210,6 +220,29 @@ pub fn cud_child_component<T, U, V>(
                     }
                 }
             }
+        }
+    }
+}
+
+/// Acts like a garbage collector to remove entities that have exceeded their lifetime
+pub fn refresh_lifetime<T, U>(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut queries: Query<
+        (Entity, &mut BiologicalClock, &T, &Identifier<U>),
+        (With<BiologicalClock>, With<T>, With<Identifier<U>>),
+    >,
+) where
+    T: Component + BiologicalTrait,
+    U: Clone + PartialEq + Send + Sync + 'static,
+{
+    for (entity, mut bioglical_clock, component, _) in queries.iter_mut() {
+        if component.get_lifetime() < &bioglical_clock.lifetime.elapsed() {
+            // Dark, but kills of all the children if the parent dies
+            commands.entity(entity).despawn_recursive();
+            info!("Entity died");
+        } else {
+            bioglical_clock.lifetime.tick(time.delta());
         }
     }
 }
