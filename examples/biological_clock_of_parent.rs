@@ -21,10 +21,22 @@ use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use bevy_family::*;
 
 #[derive(Component, Clone)]
-struct Building;
+struct Building(std::time::Duration);
 
 #[derive(Component, Clone)]
-struct Level;
+struct Level(std::time::Duration);
+
+impl BiologicalTrait for Building {
+    fn get_lifetime(&self) -> std::time::Duration {
+        self.0
+    }
+}
+
+impl BiologicalTrait for Level {
+    fn get_lifetime(&self) -> std::time::Duration {
+        self.0
+    }
+}
 
 fn main() {
     App::new()
@@ -34,69 +46,36 @@ fn main() {
         .add_event::<ChildEvent<Level, String>>()
         .add_systems(Update, cud_parent_component::<Building, String>)
         .add_systems(Update, cud_child_component::<Building, Level, String>)
+        .add_systems(Update, refresh_by_parent_lifetime::<Building, Level>)
         .add_plugins(EguiPlugin)
+        .add_systems(Startup, spawn_parent)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
         .run();
 }
 
-fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>, mut child_event_writer: EventWriter<ChildEvent<Level, String>>) {
+fn spawn_parent(mut parent_event_writer: EventWriter<ParentEvent<Building, String>>){
+    parent_event_writer.send(ParentEvent {
+        action: Action::Create,
+        self_identifier: Identifier("Building".to_string()),
+        component: Building(std::time::Duration::from_secs(5)),
+    });
+}
+
+fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWriter<ChildEvent<Level, String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
         .resizable(true)
         .show(ctx, |ui| {
-            ui.label("Parent Interaction");
-            ui.horizontal(|ui| {
-                if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Create,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
-                }
-                if ui.button("Modify parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Update,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
-                }
-                if ui.button("Remove parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Delete,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
-                }
-            });
-
-            ui.separator();
-
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
-                if ui.button("Add child").clicked() {
+                if ui.button("Add child with 30 seconds lifetime").clicked() {
                     child_event_writer.send(ChildEvent {
                         action: Action::Create,
                         parent_identifier: Identifier("Building".to_string()),
                         self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
-                }
-                if ui.button("Modify child").clicked() {
-                    child_event_writer.send(ChildEvent {
-                        action: Action::Update,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
-                }
-                if ui.button("Remove child").clicked() {
-                    child_event_writer.send(ChildEvent {
-                        action: Action::Delete,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
+                        component: Level(std::time::Duration::from_secs(30)),
                     });
                 }
             });

@@ -35,17 +35,14 @@ fn main() {
         .add_plugins(FamilyPlugin::<String>::default())
         .add_event::<ParentEvent<Building, String>>()
         .add_systems(Update, cud_parent_component::<Building, String>)
-        .add_systems(Update, refresh_lifetime::<Building, String>)
+        .add_systems(Update, refresh_by_own_lifetime::<Building>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
         .run();
 }
 
-fn interaction_panel(
-    mut contexts: EguiContexts,
-    mut parent_event_writer: EventWriter<ParentEvent<Building, String>>,
-) {
+fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
@@ -56,20 +53,6 @@ fn interaction_panel(
                 if ui.button("Add parent").clicked() {
                     parent_event_writer.send(ParentEvent {
                         action: Action::Create,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building(std::time::Duration::from_secs(5)),
-                    });
-                }
-                if ui.button("Modify parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Update,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building(std::time::Duration::from_secs(5)),
-                    });
-                }
-                if ui.button("Remove parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Delete,
                         self_identifier: Identifier("Building".to_string()),
                         component: Building(std::time::Duration::from_secs(5)),
                     });

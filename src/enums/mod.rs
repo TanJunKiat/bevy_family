@@ -21,4 +21,5 @@ pub enum Action {
     Create,
     Update,
     Delete,
+    Clear,
 }

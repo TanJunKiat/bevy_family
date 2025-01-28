@@ -50,11 +50,7 @@ impl Default for UuidResource {
     }
 }
 
-fn interaction_panel(
-    mut contexts: EguiContexts,
-    mut parent_event_writer: EventWriter<ParentEvent<Building, Uuid>>,
-    mut uuid_resource: Local<UuidResource>,
-) {
+fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, Uuid>>, mut uuid_resource: Local<UuidResource>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")

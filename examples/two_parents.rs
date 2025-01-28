@@ -40,11 +40,7 @@ fn main() {
         .run();
 }
 
-fn interaction_panel(
-    mut contexts: EguiContexts,
-    mut parent1_event_writer: EventWriter<ParentEvent<Parent1, String>>,
-    mut parent2_event_writer: EventWriter<ParentEvent<Parent2, String>>,
-) {
+fn interaction_panel(mut contexts: EguiContexts, mut parent1_event_writer: EventWriter<ParentEvent<Parent1, String>>, mut parent2_event_writer: EventWriter<ParentEvent<Parent2, String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")

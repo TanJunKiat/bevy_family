@@ -1,14 +1,19 @@
 [package]
 name = "bevy_family"
-version = "0.1.3"
+version = "0.1.4"
 description = "A simple crate that helps with creating, updating, and removing parent-child components in Bevy"
 license = "Apache-2.0"
 edition = "2021"
 
 [dependencies]
-bevy = "0.15.1"
+bevy_app = "0.15.1"
+bevy_ecs = "0.15.1"
+bevy_hierarchy = "0.15.1"
+bevy_log = "0.15.1"
+bevy_time = "0.15.1"
 
 [dev-dependencies]
+bevy = "0.15.1"
 bevy_egui = "0.32.0"
 env_logger = "0.11.6"
 uuid = "1.12.1"

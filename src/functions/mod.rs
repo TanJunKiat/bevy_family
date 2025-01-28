@@ -19,10 +19,7 @@
 use super::*;
 
 /// Get the entity by the identifier
-pub fn get_entity_by_identifier<T, U>(
-    queries: &Query<(Entity, &mut T, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
-    identifier: &Identifier<U>,
-) -> Option<Entity>
+pub fn get_entity_by_identifier<T, U>(queries: &Query<(Entity, &mut T, &Identifier<U>), (With<T>, With<Identifier<U>>)>, identifier: &Identifier<U>) -> Option<Entity>
 where
     T: Component,
     U: PartialEq + Send + Sync + 'static,
@@ -36,10 +33,7 @@ where
 }
 
 /// Get the component by the identifier
-pub fn get_component_by_identifier<T, U>(
-    queries: &Query<(Entity, &T, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
-    identifier: &Identifier<U>,
-) -> Option<T>
+pub fn get_component_by_identifier<T, U>(queries: &Query<(Entity, &T, &Identifier<U>), (With<T>, With<Identifier<U>>)>, identifier: &Identifier<U>) -> Option<T>
 where
     T: Component + Clone,
     U: PartialEq + Send + Sync + 'static,
@@ -51,4 +45,3 @@ where
     }
     return None;
 }
-
