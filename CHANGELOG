@@ -2,6 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.1.4] - 2024-01-27
+
+### Added
+    Added a system to clear child entities based on parent's lifetime with an example.
+    Added a `Clear` action to parent's event to clear all children on event trigger.
+
+### Changed
+    Optimized cargo.toml dependencies
+
 ## [0.1.3] - 2024-01-27
 
 ### Changed
