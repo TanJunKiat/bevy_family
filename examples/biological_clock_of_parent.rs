@@ -24,15 +24,9 @@ use bevy_family::*;
 struct Building(std::time::Duration);
 
 #[derive(Component, Clone)]
-struct Level(std::time::Duration);
+struct Level;
 
 impl BiologicalTrait for Building {
-    fn get_lifetime(&self) -> std::time::Duration {
-        self.0
-    }
-}
-
-impl BiologicalTrait for Level {
     fn get_lifetime(&self) -> std::time::Duration {
         self.0
     }
@@ -67,7 +61,7 @@ fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWr
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child with 30 seconds lifetime").clicked() {
-                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level(std::time::Duration::from_secs(30))));
+                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level));
                 }
             });
 
