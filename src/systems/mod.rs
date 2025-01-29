@@ -196,7 +196,7 @@ pub fn refresh_by_parent_lifetime<T, U>(mut commands: Commands, time: Res<Time>,
     mut child_queries: Query<(&Parent, Entity, &mut BiologicalClock), (With<BiologicalClock>, With<U>)>)
 where
     T: Component + BiologicalTrait,
-    U: Component + BiologicalTrait,
+    U: Component,
 {
     for (parent, child_entity, mut child_bioglical_clock) in child_queries.iter_mut() {
         match parent_queries.get(**parent) {
