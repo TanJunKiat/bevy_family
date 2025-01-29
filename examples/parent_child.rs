@@ -49,25 +49,13 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventW
             ui.label("Parent Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Create,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
+                    parent_event_writer.send(ParentEvent::create("Building".into(), Building));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Update,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
+                    parent_event_writer.send(ParentEvent::update("Building".into(), Building));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Delete,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
+                    parent_event_writer.send(ParentEvent::delete("Building".into(), Building));
                 }
             });
 
@@ -76,28 +64,13 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventW
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
-                    child_event_writer.send(ChildEvent {
-                        action: Action::Create,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
+                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level));
                 }
                 if ui.button("Modify child").clicked() {
-                    child_event_writer.send(ChildEvent {
-                        action: Action::Update,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
+                    child_event_writer.send(ChildEvent::update("Building".into(), "Level".into(), Level));
                 }
                 if ui.button("Remove child").clicked() {
-                    child_event_writer.send(ChildEvent {
-                        action: Action::Delete,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
+                    child_event_writer.send(ChildEvent::delete("Building".into(), "Level".into(), Level));
                 }
             });
 

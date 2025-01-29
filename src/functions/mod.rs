@@ -46,17 +46,14 @@ where
     return None;
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[derive(Component, Clone)]
     struct ExperiencePoints;
-    
-    fn runtime_system(
-        queries: Query<(Entity, &mut ExperiencePoints, &Identifier<String>), (With<ExperiencePoints>, With<Identifier<String>>)>,
-    ) {
+
+    fn runtime_system(queries: Query<(Entity, &mut ExperiencePoints, &Identifier<String>), (With<ExperiencePoints>, With<Identifier<String>>)>) {
         let identifier = Identifier("player".to_string());
         let entity = get_entity_by_identifier::<ExperiencePoints, String>(&queries, &identifier);
         assert!(entity.is_some());
@@ -68,7 +65,7 @@ mod tests {
     #[test]
     fn get_entity_by_identifier_test() {
         let mut app = App::new();
-        app.world_mut().spawn((ExperiencePoints,Identifier("player".to_string())));
+        app.world_mut().spawn((ExperiencePoints, Identifier("player".to_string())));
         app.add_systems(Update, runtime_system);
         app.update();
     }

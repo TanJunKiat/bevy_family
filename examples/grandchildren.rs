@@ -59,25 +59,13 @@ fn interaction_panel(
             ui.label("Building Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add building").clicked() {
-                    building_event_writer.send(ParentEvent {
-                        action: Action::Create,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
+                    building_event_writer.send(ParentEvent::create("Building".into(), Building));
                 }
                 if ui.button("Modify building").clicked() {
-                    building_event_writer.send(ParentEvent {
-                        action: Action::Update,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
+                    building_event_writer.send(ParentEvent::update("Building".into(), Building));
                 }
                 if ui.button("Remove building").clicked() {
-                    building_event_writer.send(ParentEvent {
-                        action: Action::Delete,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building,
-                    });
+                    building_event_writer.send(ParentEvent::delete("Building".into(), Building));
                 }
             });
 
@@ -86,28 +74,13 @@ fn interaction_panel(
             ui.label("Level Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add level").clicked() {
-                    level_event_writer.send(ChildEvent {
-                        action: Action::Create,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
+                    level_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level));
                 }
                 if ui.button("Modify level").clicked() {
-                    level_event_writer.send(ChildEvent {
-                        action: Action::Update,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
+                    level_event_writer.send(ChildEvent::update("Building".into(), "Level".into(), Level));
                 }
                 if ui.button("Remove level").clicked() {
-                    level_event_writer.send(ChildEvent {
-                        action: Action::Delete,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level,
-                    });
+                    level_event_writer.send(ChildEvent::delete("Building".into(), "Level".into(), Level));
                 }
             });
 
@@ -116,28 +89,13 @@ fn interaction_panel(
             ui.label("Room Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add room").clicked() {
-                    room_event_writer.send(ChildEvent {
-                        action: Action::Create,
-                        parent_identifier: Identifier("Level".to_string()),
-                        self_identifier: Identifier("Room".to_string()),
-                        component: Room,
-                    });
+                    room_event_writer.send(ChildEvent::create("Level".into(), "Room".into(), Room));
                 }
                 if ui.button("Modify room").clicked() {
-                    room_event_writer.send(ChildEvent {
-                        action: Action::Update,
-                        parent_identifier: Identifier("Level".to_string()),
-                        self_identifier: Identifier("Room".to_string()),
-                        component: Room,
-                    });
+                    room_event_writer.send(ChildEvent::update("Level".into(), "Room".into(), Room));
                 }
                 if ui.button("Remove room").clicked() {
-                    room_event_writer.send(ChildEvent {
-                        action: Action::Delete,
-                        parent_identifier: Identifier("Level".to_string()),
-                        self_identifier: Identifier("Room".to_string()),
-                        component: Room,
-                    });
+                    room_event_writer.send(ChildEvent::delete("Level".into(), "Room".into(), Room));
                 }
             });
 

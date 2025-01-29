@@ -54,12 +54,8 @@ fn main() {
         .run();
 }
 
-fn spawn_parent(mut parent_event_writer: EventWriter<ParentEvent<Building, String>>){
-    parent_event_writer.send(ParentEvent {
-        action: Action::Create,
-        self_identifier: Identifier("Building".to_string()),
-        component: Building(std::time::Duration::from_secs(5)),
-    });
+fn spawn_parent(mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
+    parent_event_writer.send(ParentEvent::create("Building".into(), Building(std::time::Duration::from_secs(5))));
 }
 
 fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWriter<ChildEvent<Level, String>>) {
@@ -71,12 +67,7 @@ fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWr
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child with 30 seconds lifetime").clicked() {
-                    child_event_writer.send(ChildEvent {
-                        action: Action::Create,
-                        parent_identifier: Identifier("Building".to_string()),
-                        self_identifier: Identifier("Level".to_string()),
-                        component: Level(std::time::Duration::from_secs(30)),
-                    });
+                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level(std::time::Duration::from_secs(30))));
                 }
             });
 

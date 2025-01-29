@@ -49,25 +49,13 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent1_event_writer: Event
             ui.label("Parent 1");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent1_event_writer.send(ParentEvent {
-                        action: Action::Create,
-                        self_identifier: Identifier("Parent1_name".to_string()),
-                        component: Parent1,
-                    });
+                    parent1_event_writer.send(ParentEvent::create("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent1_event_writer.send(ParentEvent {
-                        action: Action::Update,
-                        self_identifier: Identifier("Parent1_name".to_string()),
-                        component: Parent1,
-                    });
+                    parent1_event_writer.send(ParentEvent::update("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent1_event_writer.send(ParentEvent {
-                        action: Action::Delete,
-                        self_identifier: Identifier("Parent1_name".to_string()),
-                        component: Parent1,
-                    });
+                    parent1_event_writer.send(ParentEvent::delete("Parent1_name".into(), Parent1));
                 }
             });
 
@@ -76,25 +64,13 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent1_event_writer: Event
             ui.label("Parent 2");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent2_event_writer.send(ParentEvent {
-                        action: Action::Create,
-                        self_identifier: Identifier("Parent2_name".to_string()),
-                        component: Parent2,
-                    });
+                    parent2_event_writer.send(ParentEvent::create("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent2_event_writer.send(ParentEvent {
-                        action: Action::Update,
-                        self_identifier: Identifier("Parent2_name".to_string()),
-                        component: Parent2,
-                    });
+                    parent2_event_writer.send(ParentEvent::update("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent2_event_writer.send(ParentEvent {
-                        action: Action::Delete,
-                        self_identifier: Identifier("Parent2_name".to_string()),
-                        component: Parent2,
-                    });
+                    parent2_event_writer.send(ParentEvent::delete("Parent2_name".into(), Parent2));
                 }
             });
 

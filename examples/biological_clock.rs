@@ -51,11 +51,7 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventW
             ui.label("Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent {
-                        action: Action::Create,
-                        self_identifier: Identifier("Building".to_string()),
-                        component: Building(std::time::Duration::from_secs(5)),
-                    });
+                    parent_event_writer.send(ParentEvent::create("Building".into(), Building(std::time::Duration::from_secs(5))));
                 }
             });
 

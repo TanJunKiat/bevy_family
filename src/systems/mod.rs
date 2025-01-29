@@ -29,59 +29,51 @@ pub fn cud_parent_component<T, U>(
     U: Clone + PartialEq + Send + Sync + 'static,
 {
     for event in events.read() {
-        match event.action {
-            Action::Create => match get_entity_by_identifier(&queries, &event.self_identifier) {
+        match event.get_action() {
+            Action::Create => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(_) => {
                     warn!("Parent entity already exists");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Err(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
-                    commands.spawn((event.component.clone(), event.self_identifier.clone(), BiologicalClock::default()));
+                    commands.spawn((event.get_component().clone(), event.get_self_identifier().clone(), BiologicalClock::default()));
                     info!("Parent entity created");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Ok(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Ok(())));
                 }
             },
-            Action::Update => match get_entity_by_identifier(&queries, &event.self_identifier) {
+            Action::Update => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(entity) => {
                     let (entity, mut component, _) = queries.get_mut(entity).unwrap();
                     commands.entity(entity).insert(BiologicalClock::default());
-                    *component = event.component.clone();
+                    *component = event.get_component().clone();
                     info!("Parent entity updated");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Ok(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
                     warn!("Parent entity does not exist");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Err(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Err(())));
                 }
             },
-            Action::Delete => match get_entity_by_identifier(&queries, &event.self_identifier) {
+            Action::Delete => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_recursive();
                     info!("Parent entity deleted");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Ok(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
                     warn!("Parent entity does not exist");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Err(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Err(())));
                 }
             },
-            Action::Clear => match get_entity_by_identifier(&queries, &event.self_identifier) {
+            Action::Clear => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_descendants();
                     info!("Parent entity's childrens cleared");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Ok(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
                     warn!("Parent entity does not exist");
-                    let history = History::new_parent_history(event.action.clone(), event.self_identifier.clone(), Err(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Err(())));
                 }
             },
         }
@@ -101,73 +93,64 @@ pub fn cud_child_component<T, U, V>(
     V: Clone + PartialEq + Send + Sync + 'static,
 {
     for event in events.read() {
-        let parent_entity = match get_entity_by_identifier(&parent_queries, &event.parent_identifier) {
+        let parent_entity = match get_entity_by_identifier(&parent_queries, event.get_parent_identifier()) {
             Some(entity) => entity,
             None => {
                 warn!("Parent entity does not exist");
-                let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Err(()));
-                lineage.add_history(history);
+                lineage.add_history(event.to_history(Err(())));
                 continue;
             }
         };
 
-        match event.action {
-            Action::Create => match get_entity_by_identifier(&child_queries, &event.self_identifier) {
+        match event.get_action() {
+            Action::Create => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(_) => {
                     warn!("Child entity already exists");
-                    let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Err(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
-                    let child_id = commands.spawn((event.component.clone(), event.self_identifier.clone(), BiologicalClock::default())).id();
+                    let child_id = commands.spawn((event.get_component().clone(), event.get_self_identifier().clone(), BiologicalClock::default())).id();
                     commands.entity(parent_entity).add_child(child_id);
                     info!("Child entity created");
-                    let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Ok(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Ok(())));
                 }
             },
             Action::Update => {
-                match get_entity_by_identifier(&child_queries, &event.self_identifier) {
+                match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                     Some(entity) => {
                         let (entity, mut component, _) = child_queries.get_mut(entity).unwrap();
                         // refresh the biological clock
                         commands.entity(entity).insert(BiologicalClock::default());
-                        *component = event.component.clone();
+                        *component = event.get_component().clone();
                         info!("Child entity updated");
-                        let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Ok(()));
-                        lineage.add_history(history);
+                        lineage.add_history(event.to_history(Ok(())));
                     }
                     None => {
                         warn!("Child entity does not exist");
-                        let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Err(()));
-                        lineage.add_history(history);
+                        lineage.add_history(event.to_history(Err(())));
                     }
                 }
             }
-            Action::Delete => match get_entity_by_identifier(&child_queries, &event.self_identifier) {
+            Action::Delete => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_recursive();
                     info!("Child entity deleted");
-                    let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Ok(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
                     warn!("Child entity does not exist");
-                    let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Err(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Err(())));
                 }
             },
-            Action::Clear => match get_entity_by_identifier(&child_queries, &event.self_identifier) {
+            Action::Clear => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_descendants();
                     info!("Child entity's childrens cleared");
-                    let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Ok(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
                     warn!("Child entity does not exist");
-                    let history = History::new_child_history(event.action.clone(), event.parent_identifier.clone(), event.self_identifier.clone(), Err(()));
-                    lineage.add_history(history);
+                    lineage.add_history(event.to_history(Err(())));
                 }
             },
         }
@@ -191,10 +174,12 @@ where
 }
 
 /// Acts like a garbage collector to remove entities that have exceeded their parent's lifetime
-pub fn refresh_by_parent_lifetime<T, U>(mut commands: Commands, time: Res<Time>,
+pub fn refresh_by_parent_lifetime<T, U>(
+    mut commands: Commands,
+    time: Res<Time>,
     parent_queries: Query<&T, With<T>>,
-    mut child_queries: Query<(&Parent, Entity, &mut BiologicalClock), (With<BiologicalClock>, With<U>)>)
-where
+    mut child_queries: Query<(&Parent, Entity, &mut BiologicalClock), (With<BiologicalClock>, With<U>)>,
+) where
     T: Component + BiologicalTrait,
     U: Component,
 {
@@ -208,7 +193,7 @@ where
                 } else {
                     child_bioglical_clock.lifetime.tick(time.delta());
                 }
-            },
+            }
             Err(_) => {
                 warn!("Parent entity does not exist");
                 continue;
