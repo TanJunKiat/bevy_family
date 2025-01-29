@@ -16,6 +16,7 @@
  *
 */
 // =========================================================================
+/// Action to interact with the entities.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Action {
     Create,

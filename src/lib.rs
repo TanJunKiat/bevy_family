@@ -48,6 +48,7 @@ impl<T> Plugin for FamilyPlugin<T>
 where
     T: Default + Send + Sync + 'static,
 {
+    /// Build the plugin
     fn build(&self, app: &mut App) {
         app.init_resource::<Lineage<T>>();
     }

@@ -16,6 +16,7 @@
  *
 */
 // =========================================================================
+/// A trait that represents the biological properties of an entity.
 pub trait BiologicalTrait {
     fn get_lifetime(&self) -> std::time::Duration;
 }

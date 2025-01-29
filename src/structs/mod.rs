@@ -18,9 +18,11 @@
 // =========================================================================
 use super::*;
 
+/// Unique identifier for the entities.
 #[derive(Component, Clone, Debug, PartialEq)]
 pub struct Identifier<T>(pub T);
 
+/// A component that represents the entity's lifetime.
 #[derive(Component, Default)]
 pub struct BiologicalClock {
     pub lifetime: bevy_time::Stopwatch,
@@ -62,14 +64,17 @@ impl<T> Lineage<T>
 where
     T: Clone + PartialEq,
 {
+    /// Add a history to the lineage.
     pub fn add_history(&mut self, history: History<T>) {
         self.histories.push(history);
     }
 
+    /// Remove a history from the lineage.
     pub fn remove_history(&mut self, history: History<T>) {
         self.histories.retain(|h| h != &history);
     }
 
+    /// Get the history by the parent identifier.
     pub fn get_histories_by_parent_identifier(&self, parent_identifier: &Identifier<T>) -> Vec<&History<T>> {
         let mut histories = Vec::new();
         for history in &self.histories {
@@ -80,6 +85,7 @@ where
         return histories;
     }
 
+    /// Get the history by the child identifier.
     pub fn get_histories_by_child_identifier(&self, child_identifier: &Identifier<T>) -> Vec<&History<T>> {
         let mut histories = Vec::new();
         for history in &self.histories {
@@ -92,6 +98,7 @@ where
         return histories;
     }
 
+    /// Get the result by the parent identifier.
     pub fn get_result_from_parent_identifier(&self, parent_identifier: &Identifier<T>) -> Result<(), ()> {
         for history in &self.histories {
             if &history.parent_identifier == parent_identifier {
@@ -101,6 +108,7 @@ where
         return Err(());
     }
 
+    /// Get the result by the child identifier.
     pub fn get_result_from_child_identifier(&self, child_identifier: &Identifier<T>) -> Result<(), ()> {
         for history in &self.histories {
             if let Some(identifier) = &history.child_identifier {
@@ -112,24 +120,29 @@ where
         return Err(());
     }
 
+    /// Clear the history.
     pub fn clear_history(&mut self) {
         self.histories.clear();
     }
 
+    /// Clear the parent histories.
     pub fn clear_parent_history(&mut self, parent_identifier: &Identifier<T>) {
         self.histories.retain(|h| &h.parent_identifier != parent_identifier);
     }
 
+    /// Clear the child histories.
     pub fn clear_child_history(&mut self, child_identifier: &Identifier<T>) {
         self.histories.retain(|h| h.child_identifier != Some(child_identifier.clone()));
     }
 
+    /// Pop the history.
     pub fn pop(&mut self) -> Option<History<T>> {
         return self.histories.pop();
     }
 }
 
 impl<T> History<T> {
+    /// Create a new parent history.
     pub fn new_parent_history(action: Action, parent_identifier: Identifier<T>, result: Result<(), ()>) -> Self {
         Self {
             action,
@@ -139,6 +152,7 @@ impl<T> History<T> {
         }
     }
 
+    /// Create a new child history.
     pub fn new_child_history(action: Action, parent_identifier: Identifier<T>, child_identifier: Identifier<T>, result: Result<(), ()>) -> Self {
         Self {
             action,

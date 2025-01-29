@@ -18,7 +18,7 @@
 // =========================================================================
 use super::*;
 
-/// Get the entity by the identifier
+/// Get the entity by the identifier.
 pub fn get_entity_by_identifier<T, U>(queries: &Query<(Entity, &mut T, &Identifier<U>), (With<T>, With<Identifier<U>>)>, identifier: &Identifier<U>) -> Option<Entity>
 where
     T: Component,
@@ -32,8 +32,8 @@ where
     return None;
 }
 
-/// Get the component by the identifier
-pub fn get_component_by_identifier<T, U>(queries: &Query<(Entity, &T, &Identifier<U>), (With<T>, With<Identifier<U>>)>, identifier: &Identifier<U>) -> Option<T>
+/// Get the component by the identifier.
+pub fn get_component_by_identifier<T, U>(queries: &Query<(Entity, &mut T, &Identifier<U>), (With<T>, With<Identifier<U>>)>, identifier: &Identifier<U>) -> Option<T>
 where
     T: Component + Clone,
     U: PartialEq + Send + Sync + 'static,
@@ -44,4 +44,32 @@ where
         }
     }
     return None;
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Component, Clone)]
+    struct ExperiencePoints;
+    
+    fn runtime_system(
+        queries: Query<(Entity, &mut ExperiencePoints, &Identifier<String>), (With<ExperiencePoints>, With<Identifier<String>>)>,
+    ) {
+        let identifier = Identifier("player".to_string());
+        let entity = get_entity_by_identifier::<ExperiencePoints, String>(&queries, &identifier);
+        assert!(entity.is_some());
+
+        let component = get_component_by_identifier::<ExperiencePoints, String>(&queries, &identifier);
+        assert!(component.is_some());
+    }
+
+    #[test]
+    fn get_entity_by_identifier_test() {
+        let mut app = App::new();
+        app.world_mut().spawn((ExperiencePoints,Identifier("player".to_string())));
+        app.add_systems(Update, runtime_system);
+        app.update();
+    }
 }
