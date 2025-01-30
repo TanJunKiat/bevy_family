@@ -54,7 +54,7 @@ mod tests {
     struct ExperiencePoints;
 
     fn runtime_system(queries: Query<(Entity, &mut ExperiencePoints, &Identifier<String>), (With<ExperiencePoints>, With<Identifier<String>>)>) {
-        let identifier = Identifier("player".to_string());
+        let identifier = Identifier("player".into());
         let entity = get_entity_by_identifier::<ExperiencePoints, String>(&queries, &identifier);
         assert!(entity.is_some());
 

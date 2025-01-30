@@ -60,7 +60,7 @@ fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWr
         .show(ctx, |ui| {
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
-                if ui.button("Add child with 30 seconds lifetime").clicked() {
+                if ui.button("Add child").clicked() {
                     child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level));
                 }
             });

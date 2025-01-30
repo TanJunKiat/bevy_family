@@ -26,18 +26,18 @@ pub fn cud_parent_component<T, U>(
     mut lineage: ResMut<Lineage<U>>,
 ) where
     T: Component + Clone,
-    U: Clone + PartialEq + Send + Sync + 'static,
+    U: Clone + std::fmt::Debug + PartialEq + Send + Sync + 'static,
 {
     for event in events.read() {
         match event.get_action() {
             Action::Create => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(_) => {
-                    warn!("Parent entity already exists");
+                    warn!("Parent entity {:?} already exists.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
                     commands.spawn((event.get_component().clone(), event.get_self_identifier().clone(), BiologicalClock::default()));
-                    info!("Parent entity created");
+                    info!("Parent entity {:?} created.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
             },
@@ -46,33 +46,33 @@ pub fn cud_parent_component<T, U>(
                     let (entity, mut component, _) = queries.get_mut(entity).unwrap();
                     commands.entity(entity).insert(BiologicalClock::default());
                     *component = event.get_component().clone();
-                    info!("Parent entity updated");
+                    info!("Parent entity {:?} updated.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
-                    warn!("Parent entity does not exist");
+                    warn!("Parent entity {:?} does not exist.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
             Action::Delete => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_recursive();
-                    info!("Parent entity deleted");
+                    info!("Parent entity {:?} deleted.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
-                    warn!("Parent entity does not exist");
+                    warn!("Parent entity {:?} does not exist.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
             Action::Clear => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_descendants();
-                    info!("Parent entity's childrens cleared");
+                    info!("Parent entity's {:?} childrens cleared.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
-                    warn!("Parent entity does not exist");
+                    warn!("Parent entity {:?} does not exist.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
@@ -90,13 +90,13 @@ pub fn cud_child_component<T, U, V>(
 ) where
     T: Component,
     U: Component + Clone,
-    V: Clone + PartialEq + Send + Sync + 'static,
+    V: Clone + std::fmt::Debug + PartialEq + Send + Sync + 'static,
 {
     for event in events.read() {
         let parent_entity = match get_entity_by_identifier(&parent_queries, event.get_parent_identifier()) {
             Some(entity) => entity,
             None => {
-                warn!("Parent entity does not exist");
+                warn!("Parent entity {:?} does not exist.", event.get_parent_identifier());
                 lineage.add_history(event.to_history(Err(())));
                 continue;
             }
@@ -105,13 +105,13 @@ pub fn cud_child_component<T, U, V>(
         match event.get_action() {
             Action::Create => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(_) => {
-                    warn!("Child entity already exists");
+                    warn!("Parent {:?} already consist of child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
                     lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
                     let child_id = commands.spawn((event.get_component().clone(), event.get_self_identifier().clone(), BiologicalClock::default())).id();
                     commands.entity(parent_entity).add_child(child_id);
-                    info!("Child entity created");
+                    info!("Child entity {:?} created under parent entity {:?}.", event.get_self_identifier(), event.get_parent_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
             },
@@ -122,11 +122,11 @@ pub fn cud_child_component<T, U, V>(
                         // refresh the biological clock
                         commands.entity(entity).insert(BiologicalClock::default());
                         *component = event.get_component().clone();
-                        info!("Child entity updated");
+                        info!("Child entity {:?} under parent entity {:?} is updated.", event.get_self_identifier(), event.get_parent_identifier());
                         lineage.add_history(event.to_history(Ok(())));
                     }
                     None => {
-                        warn!("Child entity does not exist");
+                        warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
                         lineage.add_history(event.to_history(Err(())));
                     }
                 }
@@ -134,22 +134,22 @@ pub fn cud_child_component<T, U, V>(
             Action::Delete => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_recursive();
-                    info!("Child entity deleted");
+                    info!("Child entity {:?} under parent entity {:?} is deleted.", event.get_self_identifier(), event.get_parent_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
-                    warn!("Child entity does not exist");
+                    warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
             Action::Clear => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_descendants();
-                    info!("Child entity's childrens cleared");
+                    info!("Child entity {:?}'s childrens are cleared.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
-                    warn!("Child entity does not exist");
+                    warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
