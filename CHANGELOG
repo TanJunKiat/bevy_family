@@ -2,6 +2,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2024-01-30
+### Added
+    More documentations on code
+### Changed
+    Changed events to in-method commands rather than direct struct composing
+    Provide more details for logging
+
 ## [0.1.4] - 2024-01-27
 
 ### Added
