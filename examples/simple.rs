@@ -35,7 +35,7 @@ fn main() {
         .run();
 }
 
-fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
+fn interaction_panel(mut commands: Commands, mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
@@ -44,13 +44,16 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventW
             ui.label("Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent::create("Building".into(), Building));
+                    let building_id = commands.spawn(Building).id();
+                    parent_event_writer.send(ParentEvent::create("Building".into(), building_id));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_event_writer.send(ParentEvent::update("Building".into(), Building));
+                    let building_id = commands.spawn(Building).id();
+                    parent_event_writer.send(ParentEvent::update("Building".into(), building_id));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_event_writer.send(ParentEvent::delete("Building".into(), Building));
+                    let building_id = commands.spawn(Building).id();
+                    parent_event_writer.send(ParentEvent::delete("Building".into(), building_id));
                 }
             });
 

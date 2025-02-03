@@ -48,11 +48,12 @@ fn main() {
         .run();
 }
 
-fn spawn_parent(mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
-    parent_event_writer.send(ParentEvent::create("Building".into(), Building(std::time::Duration::from_secs(5))));
+fn spawn_parent(mut commands: Commands, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
+    let building_id = commands.spawn(Building(std::time::Duration::from_secs(5))).id();
+    parent_event_writer.send(ParentEvent::create("Building".into(), building_id));
 }
 
-fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWriter<ChildEvent<Level, String>>) {
+fn interaction_panel(mut commands: Commands, mut contexts: EguiContexts, mut child_event_writer: EventWriter<ChildEvent<Level, String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
@@ -61,7 +62,8 @@ fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWr
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
-                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level));
+                    let level_id = commands.spawn(Level).id();
+                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), level_id));
                 }
             });
 

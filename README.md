@@ -89,3 +89,4 @@ With that, the plugin use the `Resource` feature of bevy to store the `History` 
 
 # Features
 - [ ] A query pipeline that allows checking of existing parent and children that are in the application.
+- [ ] Able to add multiple components to a parent entity

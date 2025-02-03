@@ -21,7 +21,7 @@ use super::*;
 /// Main system to handle the creation, updating and deletion of parent entities
 pub fn cud_parent_component<T, U>(
     mut commands: Commands,
-    mut queries: Query<(Entity, &mut T, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
+    queries: Query<(Entity, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
     mut events: EventReader<ParentEvent<T, U>>,
     mut lineage: ResMut<Lineage<U>>,
 ) where
@@ -36,16 +36,17 @@ pub fn cud_parent_component<T, U>(
                     lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
-                    commands.spawn((event.get_component().clone(), event.get_self_identifier().clone(), BiologicalClock::default()));
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
                     info!("Parent entity {:?} created.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
             },
             Action::Update => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(entity) => {
-                    let (entity, mut component, _) = queries.get_mut(entity).unwrap();
-                    commands.entity(entity).insert(BiologicalClock::default());
-                    *component = event.get_component().clone();
+                    commands.entity(entity).despawn_recursive();
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
                     info!("Parent entity {:?} updated.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
@@ -84,8 +85,8 @@ pub fn cud_parent_component<T, U>(
 pub fn cud_child_component<T, U, V>(
     mut commands: Commands,
     mut events: EventReader<ChildEvent<U, V>>,
-    parent_queries: Query<(Entity, &mut T, &Identifier<V>), (With<T>, With<Identifier<V>>)>,
-    mut child_queries: Query<(Entity, &mut U, &Identifier<V>), (With<U>, With<Identifier<V>>)>,
+    parent_queries: Query<(Entity, &Identifier<V>), (With<T>, With<Identifier<V>>)>,
+    child_queries: Query<(Entity, &Identifier<V>), (With<U>, With<Identifier<V>>)>,
     mut lineage: ResMut<Lineage<V>>,
 ) where
     T: Component,
@@ -109,28 +110,27 @@ pub fn cud_child_component<T, U, V>(
                     lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
-                    let child_id = commands.spawn((event.get_component().clone(), event.get_self_identifier().clone(), BiologicalClock::default())).id();
-                    commands.entity(parent_entity).add_child(child_id);
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
+                    commands.entity(parent_entity).add_child(event.get_entity());
                     info!("Child entity {:?} created under parent entity {:?}.", event.get_self_identifier(), event.get_parent_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
             },
-            Action::Update => {
-                match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
-                    Some(entity) => {
-                        let (entity, mut component, _) = child_queries.get_mut(entity).unwrap();
-                        // refresh the biological clock
-                        commands.entity(entity).insert(BiologicalClock::default());
-                        *component = event.get_component().clone();
-                        info!("Child entity {:?} under parent entity {:?} is updated.", event.get_self_identifier(), event.get_parent_identifier());
-                        lineage.add_history(event.to_history(Ok(())));
-                    }
-                    None => {
-                        warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
-                        lineage.add_history(event.to_history(Err(())));
-                    }
+            Action::Update => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
+                Some(entity) => {
+                    commands.entity(entity).despawn_recursive();
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
+                    commands.entity(parent_entity).add_child(event.get_entity());
+                    info!("Child entity {:?} under parent entity {:?} is updated.", event.get_self_identifier(), event.get_parent_identifier());
+                    lineage.add_history(event.to_history(Ok(())));
                 }
-            }
+                None => {
+                    warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
+                    lineage.add_history(event.to_history(Err(())));
+                }
+            },
             Action::Delete => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_recursive();

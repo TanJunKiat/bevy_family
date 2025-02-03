@@ -40,7 +40,12 @@ fn main() {
         .run();
 }
 
-fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>, mut child_event_writer: EventWriter<ChildEvent<Level, String>>) {
+fn interaction_panel(
+    mut commands: Commands,
+    mut contexts: EguiContexts,
+    mut parent_event_writer: EventWriter<ParentEvent<Building, String>>,
+    mut child_event_writer: EventWriter<ChildEvent<Level, String>>,
+) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
@@ -49,13 +54,16 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventW
             ui.label("Parent Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent::create("Building".into(), Building));
+                    let building_id = commands.spawn(Building).id();
+                    parent_event_writer.send(ParentEvent::create("Building".into(), building_id));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_event_writer.send(ParentEvent::update("Building".into(), Building));
+                    let building_id = commands.spawn(Building).id();
+                    parent_event_writer.send(ParentEvent::update("Building".into(), building_id));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_event_writer.send(ParentEvent::delete("Building".into(), Building));
+                    let building_id = commands.spawn(Building).id();
+                    parent_event_writer.send(ParentEvent::delete("Building".into(), building_id));
                 }
             });
 
@@ -64,13 +72,16 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventW
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
-                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), Level));
+                    let level_id = commands.spawn(Level).id();
+                    child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), level_id));
                 }
                 if ui.button("Modify child").clicked() {
-                    child_event_writer.send(ChildEvent::update("Building".into(), "Level".into(), Level));
+                    let level_id = commands.spawn(Level).id();
+                    child_event_writer.send(ChildEvent::update("Building".into(), "Level".into(), level_id));
                 }
                 if ui.button("Remove child").clicked() {
-                    child_event_writer.send(ChildEvent::delete("Building".into(), "Level".into(), Level));
+                    let level_id = commands.spawn(Level).id();
+                    child_event_writer.send(ChildEvent::delete("Building".into(), "Level".into(), level_id));
                 }
             });
 

@@ -42,7 +42,7 @@ fn main() {
         .run();
 }
 
-fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
+fn interaction_panel(mut commands: Commands, mut contexts: EguiContexts, mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
@@ -51,10 +51,10 @@ fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventW
             ui.label("Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent::create("Building".into(), Building(std::time::Duration::from_secs(5))));
+                    let building_id = commands.spawn(Building(std::time::Duration::from_secs(5))).id();
+                    parent_event_writer.send(ParentEvent::create("Building".into(), building_id));
                 }
             });
-
             ui.allocate_rect(ui.available_rect_before_wrap(), egui::Sense::hover());
         })
         .response

@@ -30,54 +30,59 @@ pub struct BiologicalClock {
 
 /// Event that is used to create, update and delete parent entities
 #[derive(Event)]
-pub struct ParentEvent<T, U> {
+pub struct ParentEvent<U, T> {
     action: Action,
-    self_identifier: Identifier<U>,
-    component: T,
+    self_identifier: Identifier<T>,
+    entity: Entity,
+    _marker: PhantomData<U>,
 }
 
-impl<T, U> ParentEvent<T, U>
+impl<U, T> ParentEvent<U, T>
 where
-    U: Clone,
+    T: Clone,
 {
     pub fn get_action(&self) -> &Action {
         &self.action
     }
-    pub fn get_self_identifier(&self) -> &Identifier<U> {
+    pub fn get_self_identifier(&self) -> &Identifier<T> {
         &self.self_identifier
     }
-    pub fn get_component(&self) -> &T {
-        &self.component
+    pub fn get_entity(&self) -> Entity {
+        self.entity.clone()
     }
-    pub fn create(self_identifier: U, component: T) -> Self {
+    pub fn create(self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Create,
             self_identifier: Identifier(self_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn update(self_identifier: U, component: T) -> Self {
+    pub fn update(self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Update,
             self_identifier: Identifier(self_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn delete(self_identifier: U, component: T) -> Self {
+    pub fn delete(self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Delete,
             self_identifier: Identifier(self_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn clear(self_identifier: U, component: T) -> Self {
+    pub fn clear(self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Clear,
             self_identifier: Identifier(self_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn to_history(&self, result: Result<(), ()>) -> History<U> {
+    pub fn to_history(&self, result: Result<(), ()>) -> History<T> {
         match self.action {
             Action::Create => History::new_parent_history(Action::Create, self.self_identifier.clone(), result),
             Action::Update => History::new_parent_history(Action::Update, self.self_identifier.clone(), result),
@@ -88,62 +93,67 @@ where
 }
 /// Event that is used to create, update and delete child entities
 #[derive(Event)]
-pub struct ChildEvent<T, U> {
+pub struct ChildEvent<U, T> {
     action: Action,
-    parent_identifier: Identifier<U>,
-    self_identifier: Identifier<U>,
-    component: T,
+    parent_identifier: Identifier<T>,
+    self_identifier: Identifier<T>,
+    entity: Entity,
+    _marker: PhantomData<U>,
 }
 
-impl<T, U> ChildEvent<T, U>
+impl<U, T> ChildEvent<U, T>
 where
-    U: Clone,
+    T: Clone,
 {
     pub fn get_action(&self) -> &Action {
         &self.action
     }
-    pub fn get_self_identifier(&self) -> &Identifier<U> {
+    pub fn get_self_identifier(&self) -> &Identifier<T> {
         &self.self_identifier
     }
-    pub fn get_parent_identifier(&self) -> &Identifier<U> {
+    pub fn get_parent_identifier(&self) -> &Identifier<T> {
         &self.parent_identifier
     }
-    pub fn get_component(&self) -> &T {
-        &self.component
+    pub fn get_entity(&self) -> Entity {
+        self.entity.clone()
     }
-    pub fn create(parent_identifier: U, self_identifier: U, component: T) -> Self {
+    pub fn create(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Create,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn update(parent_identifier: U, self_identifier: U, component: T) -> Self {
+    pub fn update(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Update,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn delete(parent_identifier: U, self_identifier: U, component: T) -> Self {
+    pub fn delete(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Delete,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn clear(parent_identifier: U, self_identifier: U, component: T) -> Self {
+    pub fn clear(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Clear,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            component,
+            entity,
+            _marker: PhantomData,
         }
     }
-    pub fn to_history(&self, result: Result<(), ()>) -> History<U> {
+    pub fn to_history(&self, result: Result<(), ()>) -> History<T> {
         match self.action {
             Action::Create => History::new_child_history(Action::Create, self.parent_identifier.clone(), self.self_identifier.clone(), result),
             Action::Update => History::new_child_history(Action::Update, self.parent_identifier.clone(), self.self_identifier.clone(), result),
