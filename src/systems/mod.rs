@@ -33,6 +33,7 @@ pub fn cud_parent_component<T, U>(
             Action::Create => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(_) => {
                     warn!("Parent entity {:?} already exists.", event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
@@ -52,6 +53,7 @@ pub fn cud_parent_component<T, U>(
                 }
                 None => {
                     warn!("Parent entity {:?} does not exist.", event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
@@ -63,6 +65,7 @@ pub fn cud_parent_component<T, U>(
                 }
                 None => {
                     warn!("Parent entity {:?} does not exist.", event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
@@ -74,6 +77,7 @@ pub fn cud_parent_component<T, U>(
                 }
                 None => {
                     warn!("Parent entity {:?} does not exist.", event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
@@ -107,6 +111,7 @@ pub fn cud_child_component<T, U, V>(
             Action::Create => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                 Some(_) => {
                     warn!("Parent {:?} already consist of child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
                 None => {
@@ -128,6 +133,7 @@ pub fn cud_child_component<T, U, V>(
                 }
                 None => {
                     warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
@@ -139,6 +145,7 @@ pub fn cud_child_component<T, U, V>(
                 }
                 None => {
                     warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
@@ -150,6 +157,7 @@ pub fn cud_child_component<T, U, V>(
                 }
                 None => {
                     warn!("Parent entity {:?} does not have child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
+                    commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
                 }
             },
