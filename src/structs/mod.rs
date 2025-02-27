@@ -85,6 +85,7 @@ where
     pub fn to_history(&self, result: Result<(), ()>) -> History<T> {
         match self.action {
             Action::Create => History::new_parent_history(Action::Create, self.self_identifier.clone(), result),
+            Action::CreateOrModify => History::new_parent_history(Action::CreateOrModify, self.self_identifier.clone(), result),
             Action::Update => History::new_parent_history(Action::Update, self.self_identifier.clone(), result),
             Action::Delete => History::new_parent_history(Action::Delete, self.self_identifier.clone(), result),
             Action::Clear => History::new_parent_history(Action::Clear, self.self_identifier.clone(), result),
@@ -156,6 +157,7 @@ where
     pub fn to_history(&self, result: Result<(), ()>) -> History<T> {
         match self.action {
             Action::Create => History::new_child_history(Action::Create, self.parent_identifier.clone(), self.self_identifier.clone(), result),
+            Action::CreateOrModify => History::new_child_history(Action::CreateOrModify, self.parent_identifier.clone(), self.self_identifier.clone(), result),
             Action::Update => History::new_child_history(Action::Update, self.parent_identifier.clone(), self.self_identifier.clone(), result),
             Action::Delete => History::new_child_history(Action::Delete, self.parent_identifier.clone(), self.self_identifier.clone(), result),
             Action::Clear => History::new_child_history(Action::Clear, self.parent_identifier.clone(), self.self_identifier.clone(), result),

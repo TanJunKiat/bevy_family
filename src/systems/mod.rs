@@ -43,6 +43,21 @@ pub fn cud_parent_component<T, U>(
                     lineage.add_history(event.to_history(Ok(())));
                 }
             },
+            Action::CreateOrModify => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
+                Some(entity) => {
+                    commands.entity(entity).despawn_recursive();
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
+                    info!("Parent entity {:?} updated.", event.get_self_identifier());
+                    lineage.add_history(event.to_history(Ok(())));
+                }
+                None => {
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
+                    info!("Parent entity {:?} created.", event.get_self_identifier());
+                    lineage.add_history(event.to_history(Ok(())));
+                }
+            },
             Action::Update => match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                 Some(entity) => {
                     commands.entity(entity).despawn_recursive();
@@ -102,7 +117,6 @@ pub fn cud_child_component<T, U, V>(
             Some(entity) => entity,
             None => {
                 warn!("Parent entity {:?} does not exist.", event.get_parent_identifier());
-                commands.entity(event.get_entity()).despawn_recursive();
                 lineage.add_history(event.to_history(Err(())));
                 continue;
             }
@@ -114,7 +128,23 @@ pub fn cud_child_component<T, U, V>(
                     warn!("Parent {:?} already consist of child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
                     commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
-                    continue;
+                }
+                None => {
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
+                    commands.entity(parent_entity).add_child(event.get_entity());
+                    info!("Child entity {:?} created under parent entity {:?}.", event.get_self_identifier(), event.get_parent_identifier());
+                    lineage.add_history(event.to_history(Ok(())));
+                }
+            },
+            Action::CreateOrModify => match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
+                Some(entity) => {
+                    commands.entity(entity).despawn_recursive();
+                    commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
+                    commands.entity(event.get_entity()).insert(BiologicalClock::default());
+                    commands.entity(parent_entity).add_child(event.get_entity());
+                    info!("Child entity {:?} under parent entity {:?} is updated.", event.get_self_identifier(), event.get_parent_identifier());
+                    lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
                     commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());

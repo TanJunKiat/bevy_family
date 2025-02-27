@@ -20,6 +20,7 @@
 #[derive(Clone, Debug, PartialEq)]
 pub enum Action {
     Create,
+    CreateOrModify,
     Update,
     Delete,
     Clear,
