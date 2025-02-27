@@ -102,6 +102,7 @@ pub fn cud_child_component<T, U, V>(
             Some(entity) => entity,
             None => {
                 warn!("Parent entity {:?} does not exist.", event.get_parent_identifier());
+                commands.entity(event.get_entity()).despawn_recursive();
                 lineage.add_history(event.to_history(Err(())));
                 continue;
             }
@@ -113,6 +114,7 @@ pub fn cud_child_component<T, U, V>(
                     warn!("Parent {:?} already consist of child entity {:?}.", event.get_parent_identifier(), event.get_self_identifier());
                     commands.entity(event.get_entity()).despawn_recursive();
                     lineage.add_history(event.to_history(Err(())));
+                    continue;
                 }
                 None => {
                     commands.entity(event.get_entity()).insert(event.get_self_identifier().clone());
