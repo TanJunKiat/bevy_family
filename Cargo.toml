@@ -1,6 +1,6 @@
 [package]
 name = "bevy_family"
-version = "0.1.6"
+version = "0.1.7"
 description = "A simple crate that helps with creating, updating, and removing parent-child components in Bevy"
 license = "Apache-2.0"
 edition = "2021"
