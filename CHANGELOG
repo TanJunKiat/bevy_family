@@ -2,6 +2,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.1.9] - 2024-02-28
+### Added
+    Added function to call for CreateOrModify action
+### Changed
+    Changed parent_child example to use CreateOrModify action
+
+
 ## [0.1.8] - 2024-02-28
 ### Added
     Added a CreateOrModify action to create an entity if it does not exist or modify it if it does.
@@ -9,7 +16,6 @@ All notable changes to this project will be documented in this file.
 ## [0.1.7] - 2024-02-27
 ### Added
     Despawn child entity if parent cannot be found
-
 
 ## [0.1.6] - 2024-02-06
 ### Changed
