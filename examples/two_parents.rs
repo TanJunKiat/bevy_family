@@ -41,7 +41,6 @@ fn main() {
 }
 
 fn interaction_panel(
-    mut commands: Commands,
     mut contexts: EguiContexts,
     mut parent_1_event_writer: EventWriter<ParentEvent<Parent1, String>>,
     mut parent_2_event_writer: EventWriter<ParentEvent<Parent2, String>>,
@@ -54,16 +53,16 @@ fn interaction_panel(
             ui.label("Parent 1");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    let parent_1 = commands.spawn(Parent1).id();
-                    parent_1_event_writer.send(ParentEvent::create("Parent1_name".into(), parent_1));
+                    parent_1_event_writer
+                        .send(ParentEvent::create("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Modify parent").clicked() {
-                    let parent_1 = commands.spawn(Parent1).id();
-                    parent_1_event_writer.send(ParentEvent::update("Parent1_name".into(), parent_1));
+                    parent_1_event_writer
+                        .send(ParentEvent::update("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Remove parent").clicked() {
-                    let parent_1 = commands.spawn(Parent1).id();
-                    parent_1_event_writer.send(ParentEvent::delete("Parent1_name".into(), parent_1));
+                    parent_1_event_writer
+                        .send(ParentEvent::delete("Parent1_name".into(), Parent1));
                 }
             });
 
@@ -72,16 +71,16 @@ fn interaction_panel(
             ui.label("Parent 2");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    let parent_2 = commands.spawn(Parent2).id();
-                    parent_2_event_writer.send(ParentEvent::create("Parent2_name".into(), parent_2));
+                    parent_2_event_writer
+                        .send(ParentEvent::create("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Modify parent").clicked() {
-                    let parent_2 = commands.spawn(Parent2).id();
-                    parent_2_event_writer.send(ParentEvent::update("Parent2_name".into(), parent_2));
+                    parent_2_event_writer
+                        .send(ParentEvent::update("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Remove parent").clicked() {
-                    let parent_2 = commands.spawn(Parent2).id();
-                    parent_2_event_writer.send(ParentEvent::delete("Parent2_name".into(), parent_2));
+                    parent_2_event_writer
+                        .send(ParentEvent::delete("Parent2_name".into(), Parent2));
                 }
             });
 
