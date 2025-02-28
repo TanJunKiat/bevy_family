@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2024-02-28
+### Changed
+    Changed entities-based events and systems to bundle-based
+
+
 ## [0.1.9] - 2024-02-28
 ### Added
     Added function to call for CreateOrModify action

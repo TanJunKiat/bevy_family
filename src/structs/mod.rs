@@ -30,16 +30,16 @@ pub struct BiologicalClock {
 
 /// Event that is used to create, update and delete parent entities
 #[derive(Event)]
-pub struct ParentEvent<U, T> {
+pub struct ParentEvent<U: Bundle, T> {
     action: Action,
     self_identifier: Identifier<T>,
-    entity: Entity,
-    _marker: PhantomData<U>,
+    bundle: U,
 }
 
 impl<U, T> ParentEvent<U, T>
 where
     T: Clone,
+    U: Bundle + Clone,
 {
     pub fn get_action(&self) -> &Action {
         &self.action
@@ -47,72 +47,79 @@ where
     pub fn get_self_identifier(&self) -> &Identifier<T> {
         &self.self_identifier
     }
-    pub fn get_entity(&self) -> Entity {
-        self.entity.clone()
+    pub fn get_bundle(&self) -> impl Bundle {
+        self.bundle.clone()
     }
-    pub fn create(self_identifier: T, entity: Entity) -> Self {
+    pub fn create(self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Create,
             self_identifier: Identifier(self_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn create_or_modify(self_identifier: T, entity: Entity) -> Self {
+    pub fn create_or_modify(self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::CreateOrModify,
             self_identifier: Identifier(self_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn update(self_identifier: T, entity: Entity) -> Self {
+    pub fn update(self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Update,
             self_identifier: Identifier(self_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn delete(self_identifier: T, entity: Entity) -> Self {
+    pub fn delete(self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Delete,
             self_identifier: Identifier(self_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn clear(self_identifier: T, entity: Entity) -> Self {
+    pub fn clear(self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Clear,
             self_identifier: Identifier(self_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
     pub fn to_history(&self, result: Result<(), ()>) -> History<T> {
         match self.action {
-            Action::Create => History::new_parent_history(Action::Create, self.self_identifier.clone(), result),
-            Action::CreateOrModify => History::new_parent_history(Action::CreateOrModify, self.self_identifier.clone(), result),
-            Action::Update => History::new_parent_history(Action::Update, self.self_identifier.clone(), result),
-            Action::Delete => History::new_parent_history(Action::Delete, self.self_identifier.clone(), result),
-            Action::Clear => History::new_parent_history(Action::Clear, self.self_identifier.clone(), result),
+            Action::Create => {
+                History::new_parent_history(Action::Create, self.self_identifier.clone(), result)
+            }
+            Action::CreateOrModify => History::new_parent_history(
+                Action::CreateOrModify,
+                self.self_identifier.clone(),
+                result,
+            ),
+            Action::Update => {
+                History::new_parent_history(Action::Update, self.self_identifier.clone(), result)
+            }
+            Action::Delete => {
+                History::new_parent_history(Action::Delete, self.self_identifier.clone(), result)
+            }
+            Action::Clear => {
+                History::new_parent_history(Action::Clear, self.self_identifier.clone(), result)
+            }
         }
     }
 }
 /// Event that is used to create, update and delete child entities
 #[derive(Event)]
-pub struct ChildEvent<U, T> {
+pub struct ChildEvent<U: Bundle, T> {
     action: Action,
     parent_identifier: Identifier<T>,
     self_identifier: Identifier<T>,
-    entity: Entity,
-    _marker: PhantomData<U>,
+    bundle: U,
 }
 
 impl<U, T> ChildEvent<U, T>
 where
     T: Clone,
+    U: Bundle + Clone,
 {
     pub fn get_action(&self) -> &Action {
         &self.action
@@ -123,61 +130,81 @@ where
     pub fn get_parent_identifier(&self) -> &Identifier<T> {
         &self.parent_identifier
     }
-    pub fn get_entity(&self) -> Entity {
-        self.entity.clone()
+    pub fn get_bundle(&self) -> U {
+        self.bundle.clone()
     }
-    pub fn create(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
+    pub fn create(parent_identifier: T, self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Create,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn create_or_modify(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
+    pub fn create_or_modify(parent_identifier: T, self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::CreateOrModify,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn update(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
+    pub fn update(parent_identifier: T, self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Update,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn delete(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
+    pub fn delete(parent_identifier: T, self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Delete,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
-    pub fn clear(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
+    pub fn clear(parent_identifier: T, self_identifier: T, bundle: U) -> Self {
         Self {
             action: Action::Clear,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
-            entity,
-            _marker: PhantomData,
+            bundle,
         }
     }
     pub fn to_history(&self, result: Result<(), ()>) -> History<T> {
         match self.action {
-            Action::Create => History::new_child_history(Action::Create, self.parent_identifier.clone(), self.self_identifier.clone(), result),
-            Action::CreateOrModify => History::new_child_history(Action::CreateOrModify, self.parent_identifier.clone(), self.self_identifier.clone(), result),
-            Action::Update => History::new_child_history(Action::Update, self.parent_identifier.clone(), self.self_identifier.clone(), result),
-            Action::Delete => History::new_child_history(Action::Delete, self.parent_identifier.clone(), self.self_identifier.clone(), result),
-            Action::Clear => History::new_child_history(Action::Clear, self.parent_identifier.clone(), self.self_identifier.clone(), result),
+            Action::Create => History::new_child_history(
+                Action::Create,
+                self.parent_identifier.clone(),
+                self.self_identifier.clone(),
+                result,
+            ),
+            Action::CreateOrModify => History::new_child_history(
+                Action::CreateOrModify,
+                self.parent_identifier.clone(),
+                self.self_identifier.clone(),
+                result,
+            ),
+            Action::Update => History::new_child_history(
+                Action::Update,
+                self.parent_identifier.clone(),
+                self.self_identifier.clone(),
+                result,
+            ),
+            Action::Delete => History::new_child_history(
+                Action::Delete,
+                self.parent_identifier.clone(),
+                self.self_identifier.clone(),
+                result,
+            ),
+            Action::Clear => History::new_child_history(
+                Action::Clear,
+                self.parent_identifier.clone(),
+                self.self_identifier.clone(),
+                result,
+            ),
         }
     }
 }
@@ -212,7 +239,10 @@ where
     }
 
     /// Get the history by the parent identifier.
-    pub fn get_histories_by_parent_identifier(&self, parent_identifier: &Identifier<T>) -> Vec<&History<T>> {
+    pub fn get_histories_by_parent_identifier(
+        &self,
+        parent_identifier: &Identifier<T>,
+    ) -> Vec<&History<T>> {
         let mut histories = Vec::new();
         for history in &self.histories {
             if &history.parent_identifier == parent_identifier {
@@ -223,7 +253,10 @@ where
     }
 
     /// Get the history by the child identifier.
-    pub fn get_histories_by_child_identifier(&self, child_identifier: &Identifier<T>) -> Vec<&History<T>> {
+    pub fn get_histories_by_child_identifier(
+        &self,
+        child_identifier: &Identifier<T>,
+    ) -> Vec<&History<T>> {
         let mut histories = Vec::new();
         for history in &self.histories {
             if let Some(identifier) = &history.child_identifier {
@@ -236,7 +269,10 @@ where
     }
 
     /// Get the result by the parent identifier.
-    pub fn get_result_from_parent_identifier(&self, parent_identifier: &Identifier<T>) -> Result<(), ()> {
+    pub fn get_result_from_parent_identifier(
+        &self,
+        parent_identifier: &Identifier<T>,
+    ) -> Result<(), ()> {
         for history in &self.histories {
             if &history.parent_identifier == parent_identifier {
                 return history.result;
@@ -246,7 +282,10 @@ where
     }
 
     /// Get the result by the child identifier.
-    pub fn get_result_from_child_identifier(&self, child_identifier: &Identifier<T>) -> Result<(), ()> {
+    pub fn get_result_from_child_identifier(
+        &self,
+        child_identifier: &Identifier<T>,
+    ) -> Result<(), ()> {
         for history in &self.histories {
             if let Some(identifier) = &history.child_identifier {
                 if identifier == child_identifier {
@@ -264,12 +303,14 @@ where
 
     /// Clear the parent histories.
     pub fn clear_parent_history(&mut self, parent_identifier: &Identifier<T>) {
-        self.histories.retain(|h| &h.parent_identifier != parent_identifier);
+        self.histories
+            .retain(|h| &h.parent_identifier != parent_identifier);
     }
 
     /// Clear the child histories.
     pub fn clear_child_history(&mut self, child_identifier: &Identifier<T>) {
-        self.histories.retain(|h| h.child_identifier != Some(child_identifier.clone()));
+        self.histories
+            .retain(|h| h.child_identifier != Some(child_identifier.clone()));
     }
 
     /// Pop the history.
@@ -280,7 +321,11 @@ where
 
 impl<T> History<T> {
     /// Create a new parent history.
-    pub fn new_parent_history(action: Action, parent_identifier: Identifier<T>, result: Result<(), ()>) -> Self {
+    pub fn new_parent_history(
+        action: Action,
+        parent_identifier: Identifier<T>,
+        result: Result<(), ()>,
+    ) -> Self {
         Self {
             action,
             parent_identifier,
@@ -290,7 +335,12 @@ impl<T> History<T> {
     }
 
     /// Create a new child history.
-    pub fn new_child_history(action: Action, parent_identifier: Identifier<T>, child_identifier: Identifier<T>, result: Result<(), ()>) -> Self {
+    pub fn new_child_history(
+        action: Action,
+        parent_identifier: Identifier<T>,
+        child_identifier: Identifier<T>,
+        result: Result<(), ()>,
+    ) -> Self {
         Self {
             action,
             parent_identifier,

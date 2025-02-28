@@ -21,55 +21,81 @@ use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use bevy_family::*;
 
 #[derive(Component, Clone)]
-struct Building(std::time::Duration);
+struct Building;
 
 #[derive(Component, Clone)]
 struct Level;
 
-impl BiologicalTrait for Building {
-    fn get_lifetime(&self) -> std::time::Duration {
-        self.0
-    }
-}
+#[derive(Component, Clone)]
+struct Lift;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
         .add_event::<ParentEvent<Building, String>>()
-        .add_event::<ChildEvent<Level, String>>()
+        .add_event::<ChildEvent<(Level, Lift), String>>()
         .add_systems(Update, cud_parent_component::<Building, String>)
-        .add_systems(Update, cud_child_component::<Building, Level, Level, String>)
-        .add_systems(Update, refresh_by_parent_lifetime::<Building, Level>)
+        .add_systems(Update, cud_child_component::<Building, Level, (Level, Lift), String>)
         .add_plugins(EguiPlugin)
-        .add_systems(Startup, spawn_parent)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
         .run();
 }
 
-fn spawn_parent(
-    mut parent_event_writer: EventWriter<ParentEvent<Building, String>>,
-) {
-    parent_event_writer.send(ParentEvent::create("Building".into(), Building(std::time::Duration::from_secs(5))));
-}
-
 fn interaction_panel(
     mut contexts: EguiContexts,
-    mut child_event_writer: EventWriter<ChildEvent<Level, String>>,
+    mut parent_event_writer: EventWriter<ParentEvent<Building, String>>,
+    mut child_event_writer: EventWriter<ChildEvent<(Level, Lift), String>>,
 ) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
         .resizable(true)
         .show(ctx, |ui| {
+            ui.label("Parent Interaction");
+            ui.horizontal(|ui| {
+                if ui.button("Add parent").clicked() {
+                    parent_event_writer.send(ParentEvent::create("Building".into(), Building));
+                }
+                if ui.button("Modify parent").clicked() {
+                    parent_event_writer.send(ParentEvent::update("Building".into(), Building));
+                }
+                if ui.button("Remove parent").clicked() {
+                    parent_event_writer.send(ParentEvent::delete("Building".into(), Building));
+                }
+            });
+
+            ui.separator();
+
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
                     child_event_writer.send(ChildEvent::create(
                         "Building".into(),
                         "Level".into(),
-                        Level,
+                        (Level, Lift),
+                    ));
+                }
+                if ui.button("Create or modify child").clicked() {
+                    child_event_writer.send(ChildEvent::create_or_modify(
+                        "Building".into(),
+                        "Level".into(),
+                        (Level, Lift),
+                    ));
+                }
+                if ui.button("Modify child").clicked() {
+                    child_event_writer.send(ChildEvent::update(
+                        "Building".into(),
+                        "Level".into(),
+                        (Level, Lift),
+                    ));
+                }
+                if ui.button("Remove child").clicked() {
+                    child_event_writer.send(ChildEvent::delete(
+                        "Building".into(),
+                        "Level".into(),
+                        (Level, Lift),
                     ));
                 }
             });
