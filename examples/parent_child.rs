@@ -75,6 +75,10 @@ fn interaction_panel(
                     let level_id = commands.spawn(Level).id();
                     child_event_writer.send(ChildEvent::create("Building".into(), "Level".into(), level_id));
                 }
+                if ui.button("Create or modify child").clicked() {
+                    let level_id = commands.spawn(Level).id();
+                    child_event_writer.send(ChildEvent::create_or_modify("Building".into(), "Level".into(), level_id));
+                }
                 if ui.button("Modify child").clicked() {
                     let level_id = commands.spawn(Level).id();
                     child_event_writer.send(ChildEvent::update("Building".into(), "Level".into(), level_id));

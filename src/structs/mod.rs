@@ -58,6 +58,14 @@ where
             _marker: PhantomData,
         }
     }
+    pub fn create_or_modify(self_identifier: T, entity: Entity) -> Self {
+        Self {
+            action: Action::CreateOrModify,
+            self_identifier: Identifier(self_identifier),
+            entity,
+            _marker: PhantomData,
+        }
+    }
     pub fn update(self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Update,
@@ -121,6 +129,15 @@ where
     pub fn create(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
         Self {
             action: Action::Create,
+            self_identifier: Identifier(self_identifier),
+            parent_identifier: Identifier(parent_identifier),
+            entity,
+            _marker: PhantomData,
+        }
+    }
+    pub fn create_or_modify(parent_identifier: T, self_identifier: T, entity: Entity) -> Self {
+        Self {
+            action: Action::CreateOrModify,
             self_identifier: Identifier(self_identifier),
             parent_identifier: Identifier(parent_identifier),
             entity,
