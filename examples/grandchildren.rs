@@ -36,8 +36,11 @@ fn main() {
         .add_event::<ParentEvent<Building, String>>()
         .add_event::<ChildEvent<Level, String>>()
         .add_event::<ChildEvent<Room, String>>()
-        .add_systems(Update, cud_parent_component::<Building, String>)
-        .add_systems(Update, cud_child_component::<Building, Level, Level, String>)
+        .add_systems(Update, cud_parent_component::<Building, Building, String>)
+        .add_systems(
+            Update,
+            cud_child_component::<Building, Level, Level, String>,
+        )
         .add_systems(Update, cud_child_component::<Level, Room, Room, String>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
@@ -101,25 +104,13 @@ fn interaction_panel(
             ui.label("Room Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add room").clicked() {
-                    room_event_writer.send(ChildEvent::create(
-                        "Level".into(),
-                        "Room".into(),
-                        Room,
-                    ));
+                    room_event_writer.send(ChildEvent::create("Level".into(), "Room".into(), Room));
                 }
                 if ui.button("Modify room").clicked() {
-                    room_event_writer.send(ChildEvent::update(
-                        "Level".into(),
-                        "Room".into(),
-                        Room,
-                    ));
+                    room_event_writer.send(ChildEvent::update("Level".into(), "Room".into(), Room));
                 }
                 if ui.button("Remove room").clicked() {
-                    room_event_writer.send(ChildEvent::delete(
-                        "Level".into(),
-                        "Room".into(),
-                        Room,
-                    ));
+                    room_event_writer.send(ChildEvent::delete("Level".into(), "Room".into(), Room));
                 }
             });
 

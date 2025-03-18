@@ -35,8 +35,11 @@ fn main() {
         .add_plugins(FamilyPlugin::<String>::default())
         .add_event::<ParentEvent<Building, String>>()
         .add_event::<ChildEvent<(Level, Lift), String>>()
-        .add_systems(Update, cud_parent_component::<Building, String>)
-        .add_systems(Update, cud_child_component::<Building, Level, (Level, Lift), String>)
+        .add_systems(Update, cud_parent_component::<Building, Building, String>)
+        .add_systems(
+            Update,
+            cud_child_component::<Building, Level, (Level, Lift), String>,
+        )
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)

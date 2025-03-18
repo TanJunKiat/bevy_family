@@ -46,7 +46,7 @@ pub fn cud_parent_component<T, U, V>(
                         event.get_self_identifier().clone(),
                         BiologicalClock::default(),
                     ));
-                    info!("Parent entity {:?} created.", event.get_self_identifier());
+                    debug!("Parent entity {:?} created.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
             },
@@ -59,7 +59,7 @@ pub fn cud_parent_component<T, U, V>(
                             event.get_self_identifier().clone(),
                             BiologicalClock::default(),
                         ));
-                        info!("Parent entity {:?} updated.", event.get_self_identifier());
+                        debug!("Parent entity {:?} updated.", event.get_self_identifier());
                         lineage.add_history(event.to_history(Ok(())));
                     }
                     None => {
@@ -68,7 +68,7 @@ pub fn cud_parent_component<T, U, V>(
                             event.get_self_identifier().clone(),
                             BiologicalClock::default(),
                         ));
-                        info!("Parent entity {:?} created.", event.get_self_identifier());
+                        debug!("Parent entity {:?} created.", event.get_self_identifier());
                         lineage.add_history(event.to_history(Ok(())));
                     }
                 }
@@ -82,7 +82,7 @@ pub fn cud_parent_component<T, U, V>(
                         event.get_self_identifier().clone(),
                         BiologicalClock::default(),
                     ));
-                    info!("Parent entity {:?} updated.", event.get_self_identifier());
+                    debug!("Parent entity {:?} updated.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
@@ -97,7 +97,7 @@ pub fn cud_parent_component<T, U, V>(
             {
                 Some(entity) => {
                     commands.entity(entity).despawn_recursive();
-                    info!("Parent entity {:?} deleted.", event.get_self_identifier());
+                    debug!("Parent entity {:?} deleted.", event.get_self_identifier());
                     lineage.add_history(event.to_history(Ok(())));
                 }
                 None => {
@@ -112,7 +112,7 @@ pub fn cud_parent_component<T, U, V>(
                 match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_descendants();
-                        info!(
+                        debug!(
                             "Parent entity's {:?} childrens cleared.",
                             event.get_self_identifier()
                         );
@@ -170,13 +170,15 @@ pub fn cud_child_component<T, U, V, W>(
                         lineage.add_history(event.to_history(Err(())));
                     }
                     None => {
-                        let child = commands.spawn((
-                            event.get_bundle(),
-                            event.get_self_identifier().clone(),
-                            BiologicalClock::default(),
-                        )).id();
+                        let child = commands
+                            .spawn((
+                                event.get_bundle(),
+                                event.get_self_identifier().clone(),
+                                BiologicalClock::default(),
+                            ))
+                            .id();
                         commands.entity(parent_entity).add_child(child);
-                        info!(
+                        debug!(
                             "Child entity {:?} created under parent entity {:?}.",
                             event.get_self_identifier(),
                             event.get_parent_identifier()
@@ -189,13 +191,15 @@ pub fn cud_child_component<T, U, V, W>(
                 match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_recursive();
-                        let child = commands.spawn((
-                            event.get_bundle(),
-                            event.get_self_identifier().clone(),
-                            BiologicalClock::default(),
-                        )).id();
+                        let child = commands
+                            .spawn((
+                                event.get_bundle(),
+                                event.get_self_identifier().clone(),
+                                BiologicalClock::default(),
+                            ))
+                            .id();
                         commands.entity(parent_entity).add_child(child);
-                        info!(
+                        debug!(
                             "Child entity {:?} under parent entity {:?} is updated.",
                             event.get_self_identifier(),
                             event.get_parent_identifier()
@@ -203,13 +207,15 @@ pub fn cud_child_component<T, U, V, W>(
                         lineage.add_history(event.to_history(Ok(())));
                     }
                     None => {
-                        let child = commands.spawn((
-                            event.get_bundle(),
-                            event.get_self_identifier().clone(),
-                            BiologicalClock::default(),
-                        )).id();
+                        let child = commands
+                            .spawn((
+                                event.get_bundle(),
+                                event.get_self_identifier().clone(),
+                                BiologicalClock::default(),
+                            ))
+                            .id();
                         commands.entity(parent_entity).add_child(child);
-                        info!(
+                        debug!(
                             "Child entity {:?} created under parent entity {:?}.",
                             event.get_self_identifier(),
                             event.get_parent_identifier()
@@ -222,13 +228,15 @@ pub fn cud_child_component<T, U, V, W>(
                 match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_recursive();
-                        let child = commands.spawn((
-                            event.get_bundle(),
-                            event.get_self_identifier().clone(),
-                            BiologicalClock::default(),
-                        )).id();
+                        let child = commands
+                            .spawn((
+                                event.get_bundle(),
+                                event.get_self_identifier().clone(),
+                                BiologicalClock::default(),
+                            ))
+                            .id();
                         commands.entity(parent_entity).add_child(child);
-                        info!(
+                        debug!(
                             "Child entity {:?} under parent entity {:?} is updated.",
                             event.get_self_identifier(),
                             event.get_parent_identifier()
@@ -249,7 +257,7 @@ pub fn cud_child_component<T, U, V, W>(
                 match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_recursive();
-                        info!(
+                        debug!(
                             "Child entity {:?} under parent entity {:?} is deleted.",
                             event.get_self_identifier(),
                             event.get_parent_identifier()
@@ -270,7 +278,7 @@ pub fn cud_child_component<T, U, V, W>(
                 match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_descendants();
-                        info!(
+                        debug!(
                             "Child entity {:?}'s childrens are cleared.",
                             event.get_self_identifier()
                         );
@@ -302,7 +310,7 @@ pub fn refresh_by_own_lifetime<T>(
         if component.get_lifetime() < bioglical_clock.lifetime.elapsed() {
             // Dark, but kills of all the children if the parent dies
             commands.entity(entity).despawn_recursive();
-            info!("Entity died");
+            debug!("Entity died");
         } else {
             bioglical_clock.lifetime.tick(time.delta());
         }
@@ -328,7 +336,7 @@ pub fn refresh_by_parent_lifetime<T, U>(
                 if parent_component.get_lifetime() < child_bioglical_clock.lifetime.elapsed() {
                     // Dark, but kills of all the children if the parent dies
                     commands.entity(child_entity).despawn_recursive();
-                    info!("Entity died");
+                    debug!("Entity died");
                 } else {
                     child_bioglical_clock.lifetime.tick(time.delta());
                 }

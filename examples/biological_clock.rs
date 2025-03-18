@@ -34,7 +34,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
         .add_event::<ParentEvent<Building, String>>()
-        .add_systems(Update, cud_parent_component::<Building, String>)
+        .add_systems(Update, cud_parent_component::<Building, Building, String>)
         .add_systems(Update, refresh_by_own_lifetime::<Building>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
@@ -54,7 +54,10 @@ fn interaction_panel(
             ui.label("Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent::create("Building".into(), Building(std::time::Duration::from_secs(5))));
+                    parent_event_writer.send(ParentEvent::create(
+                        "Building".into(),
+                        Building(std::time::Duration::from_secs(5)),
+                    ));
                 }
             });
             ui.allocate_rect(ui.available_rect_before_wrap(), egui::Sense::hover());

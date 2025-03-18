@@ -32,8 +32,8 @@ fn main() {
         .add_plugins(FamilyPlugin::<String>::default())
         .add_event::<ParentEvent<Parent1, String>>()
         .add_event::<ParentEvent<Parent2, String>>()
-        .add_systems(Update, cud_parent_component::<Parent1, String>)
-        .add_systems(Update, cud_parent_component::<Parent2, String>)
+        .add_systems(Update, cud_parent_component::<Parent1, Parent1, String>)
+        .add_systems(Update, cud_parent_component::<Parent2, Parent2, String>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
@@ -53,16 +53,13 @@ fn interaction_panel(
             ui.label("Parent 1");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_1_event_writer
-                        .send(ParentEvent::create("Parent1_name".into(), Parent1));
+                    parent_1_event_writer.send(ParentEvent::create("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_1_event_writer
-                        .send(ParentEvent::update("Parent1_name".into(), Parent1));
+                    parent_1_event_writer.send(ParentEvent::update("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_1_event_writer
-                        .send(ParentEvent::delete("Parent1_name".into(), Parent1));
+                    parent_1_event_writer.send(ParentEvent::delete("Parent1_name".into(), Parent1));
                 }
             });
 
@@ -71,16 +68,13 @@ fn interaction_panel(
             ui.label("Parent 2");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_2_event_writer
-                        .send(ParentEvent::create("Parent2_name".into(), Parent2));
+                    parent_2_event_writer.send(ParentEvent::create("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_2_event_writer
-                        .send(ParentEvent::update("Parent2_name".into(), Parent2));
+                    parent_2_event_writer.send(ParentEvent::update("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_2_event_writer
-                        .send(ParentEvent::delete("Parent2_name".into(), Parent2));
+                    parent_2_event_writer.send(ParentEvent::delete("Parent2_name".into(), Parent2));
                 }
             });
 
