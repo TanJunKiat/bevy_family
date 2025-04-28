@@ -34,7 +34,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
         .add_event::<ParentEvent<Building, String>>()
-        .add_systems(Update, cud_parent_component::<Building, Building, String>)
+        .add_systems(Update, cud_parent_component::<Building, String>)
         .add_systems(Update, refresh_by_own_lifetime::<Building>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)

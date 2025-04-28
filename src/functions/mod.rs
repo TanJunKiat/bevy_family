@@ -19,12 +19,11 @@
 use super::*;
 
 /// Get the entity by the identifier.
-pub fn get_entity_by_identifier<T, U>(
-    queries: &Query<(Entity, &Identifier<U>), (With<T>, With<Identifier<U>>)>,
+pub fn get_entity_by_identifier<U>(
+    queries: &Query<(Entity, &Identifier<U>), With<Identifier<U>>>,
     identifier: &Identifier<U>,
 ) -> Option<Entity>
 where
-    T: Component,
     U: PartialEq + Send + Sync + 'static,
 {
     for (entity, id) in queries.iter() {

@@ -28,7 +28,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<Uuid>::default())
         .add_event::<ParentEvent<Building, Uuid>>()
-        .add_systems(Update, cud_parent_component::<Building, Building, Uuid>)
+        .add_systems(Update, cud_parent_component::<Building, Uuid>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)

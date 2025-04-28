@@ -19,13 +19,12 @@
 use super::*;
 
 /// Main system to handle the creation, updating and deletion of parent entities
-pub fn cud_parent_component<T, U, V>(
+pub fn cud_parent_component<U, V>(
     mut commands: Commands,
-    queries: Query<(Entity, &Identifier<V>), (With<T>, With<Identifier<V>>)>,
+    queries: Query<(Entity, &Identifier<V>), With<Identifier<V>>>,
     mut events: EventReader<ParentEvent<U, V>>,
     mut lineage: ResMut<Lineage<V>>,
 ) where
-    T: Component + Clone,
     U: Bundle + Clone,
     V: Clone + std::fmt::Debug + PartialEq + Send + Sync + 'static,
 {
@@ -132,35 +131,32 @@ pub fn cud_parent_component<T, U, V>(
 }
 
 /// Main system to handle the creation, updating and deletion of child entities
-pub fn cud_child_component<T, U, V, W>(
+pub fn cud_child_component<V, W>(
     mut commands: Commands,
     mut events: EventReader<ChildEvent<V, W>>,
-    parent_queries: Query<(Entity, &Identifier<W>), (With<T>, With<Identifier<W>>)>,
-    child_queries: Query<(Entity, &Identifier<W>), (With<U>, With<Identifier<W>>)>,
+    queries: Query<(Entity, &Identifier<W>), With<Identifier<W>>>,
     mut lineage: ResMut<Lineage<W>>,
 ) where
-    T: Component,
-    U: Component + Clone,
     V: Bundle + Clone,
     W: Clone + std::fmt::Debug + PartialEq + Send + Sync + 'static,
 {
     for event in events.read() {
-        let parent_entity =
-            match get_entity_by_identifier(&parent_queries, event.get_parent_identifier()) {
-                Some(entity) => entity,
-                None => {
-                    warn!(
-                        "Parent entity {:?} does not exist.",
-                        event.get_parent_identifier()
-                    );
-                    lineage.add_history(event.to_history(Err(())));
-                    continue;
-                }
-            };
+        let parent_entity = match get_entity_by_identifier(&queries, event.get_parent_identifier())
+        {
+            Some(entity) => entity,
+            None => {
+                warn!(
+                    "Parent entity {:?} does not exist.",
+                    event.get_parent_identifier()
+                );
+                lineage.add_history(event.to_history(Err(())));
+                continue;
+            }
+        };
 
         match event.get_action() {
             Action::Create => {
-                match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
+                match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                     Some(_) => {
                         warn!(
                             "Parent {:?} already consist of child entity {:?}.",
@@ -188,7 +184,7 @@ pub fn cud_child_component<T, U, V, W>(
                 }
             }
             Action::CreateOrModify => {
-                match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
+                match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_recursive();
                         let child = commands
@@ -225,7 +221,7 @@ pub fn cud_child_component<T, U, V, W>(
                 }
             }
             Action::Update => {
-                match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
+                match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_recursive();
                         let child = commands
@@ -254,7 +250,7 @@ pub fn cud_child_component<T, U, V, W>(
                 }
             }
             Action::Delete => {
-                match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
+                match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_recursive();
                         debug!(
@@ -275,7 +271,7 @@ pub fn cud_child_component<T, U, V, W>(
                 }
             }
             Action::Clear => {
-                match get_entity_by_identifier(&child_queries, event.get_self_identifier()) {
+                match get_entity_by_identifier(&queries, event.get_self_identifier()) {
                     Some(entity) => {
                         commands.entity(entity).despawn_descendants();
                         debug!(
