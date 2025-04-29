@@ -74,25 +74,13 @@ fn interaction_panel(
             ui.label("Level Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add level").clicked() {
-                    level_event_writer.send(CudEvent::create_child(
-                        "Building".into(),
-                        "Level".into(),
-                        Level,
-                    ));
+                    level_event_writer.send(CudEvent::create_child("Building".into(), "Level".into(), Level));
                 }
                 if ui.button("Modify level").clicked() {
-                    level_event_writer.send(CudEvent::update_child(
-                        "Building".into(),
-                        "Level".into(),
-                        Level,
-                    ));
+                    level_event_writer.send(CudEvent::update_child("Building".into(), "Level".into(), Level));
                 }
                 if ui.button("Remove level").clicked() {
-                    level_event_writer.send(CudEvent::delete_child(
-                        "Building".into(),
-                        "Level".into(),
-                        Level,
-                    ));
+                    level_event_writer.send(CudEvent::delete_child("Building".into(), "Level".into(), Level));
                 }
             });
 

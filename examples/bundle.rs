@@ -43,11 +43,7 @@ fn main() {
         .run();
 }
 
-fn interaction_panel(
-    mut contexts: EguiContexts,
-    mut parent_event_writer: EventWriter<CudEvent<Building, String>>,
-    mut child_event_writer: EventWriter<CudEvent<(Level, Lift), String>>,
-) {
+fn interaction_panel(mut contexts: EguiContexts, mut parent_event_writer: EventWriter<CudEvent<Building, String>>, mut child_event_writer: EventWriter<CudEvent<(Level, Lift), String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
@@ -71,32 +67,16 @@ fn interaction_panel(
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
-                    child_event_writer.send(CudEvent::create_child(
-                        "Building".into(),
-                        "Level".into(),
-                        (Level, Lift),
-                    ));
+                    child_event_writer.send(CudEvent::create_child("Building".into(), "Level".into(), (Level, Lift)));
                 }
                 if ui.button("Create or modify child").clicked() {
-                    child_event_writer.send(CudEvent::create_or_modify_child(
-                        "Building".into(),
-                        "Level".into(),
-                        (Level, Lift),
-                    ));
+                    child_event_writer.send(CudEvent::create_or_modify_child("Building".into(), "Level".into(), (Level, Lift)));
                 }
                 if ui.button("Modify child").clicked() {
-                    child_event_writer.send(CudEvent::update_child(
-                        "Building".into(),
-                        "Level".into(),
-                        (Level, Lift),
-                    ));
+                    child_event_writer.send(CudEvent::update_child("Building".into(), "Level".into(), (Level, Lift)));
                 }
                 if ui.button("Remove child").clicked() {
-                    child_event_writer.send(CudEvent::delete_child(
-                        "Building".into(),
-                        "Level".into(),
-                        (Level, Lift),
-                    ));
+                    child_event_writer.send(CudEvent::delete_child("Building".into(), "Level".into(), (Level, Lift)));
                 }
             });
 

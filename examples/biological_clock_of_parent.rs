@@ -49,16 +49,10 @@ fn main() {
 }
 
 fn spawn_parent(mut parent_event_writer: EventWriter<CudEvent<Building, String>>) {
-    parent_event_writer.send(CudEvent::create_parent(
-        "Building".into(),
-        Building(std::time::Duration::from_secs(5)),
-    ));
+    parent_event_writer.send(CudEvent::create_parent("Building".into(), Building(std::time::Duration::from_secs(5))));
 }
 
-fn interaction_panel(
-    mut contexts: EguiContexts,
-    mut child_event_writer: EventWriter<CudEvent<Level, String>>,
-) {
+fn interaction_panel(mut contexts: EguiContexts, mut child_event_writer: EventWriter<CudEvent<Level, String>>) {
     let ctx = contexts.ctx_mut();
 
     egui::SidePanel::left("left_panel")
@@ -67,11 +61,7 @@ fn interaction_panel(
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
-                    child_event_writer.send(CudEvent::create_child(
-                        "Building".into(),
-                        "Level".into(),
-                        Level,
-                    ));
+                    child_event_writer.send(CudEvent::create_child("Building".into(), "Level".into(), Level));
                 }
             });
 
