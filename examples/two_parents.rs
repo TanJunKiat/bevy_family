@@ -30,10 +30,10 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
-        .add_event::<ParentEvent<Parent1, String>>()
-        .add_event::<ParentEvent<Parent2, String>>()
-        .add_systems(Update, cud_parent_component::<Parent1, String>)
-        .add_systems(Update, cud_parent_component::<Parent2, String>)
+        .add_event::<CudEvent<Parent1, String>>()
+        .add_event::<CudEvent<Parent2, String>>()
+        .add_systems(Update, cud_bundle::<Parent1, String>)
+        .add_systems(Update, cud_bundle::<Parent2, String>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
@@ -42,8 +42,8 @@ fn main() {
 
 fn interaction_panel(
     mut contexts: EguiContexts,
-    mut parent_1_event_writer: EventWriter<ParentEvent<Parent1, String>>,
-    mut parent_2_event_writer: EventWriter<ParentEvent<Parent2, String>>,
+    mut parent_1_event_writer: EventWriter<CudEvent<Parent1, String>>,
+    mut parent_2_event_writer: EventWriter<CudEvent<Parent2, String>>,
 ) {
     let ctx = contexts.ctx_mut();
 
@@ -53,13 +53,13 @@ fn interaction_panel(
             ui.label("Parent 1");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_1_event_writer.send(ParentEvent::create("Parent1_name".into(), Parent1));
+                    parent_1_event_writer.send(CudEvent::create_parent("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_1_event_writer.send(ParentEvent::update("Parent1_name".into(), Parent1));
+                    parent_1_event_writer.send(CudEvent::update_parent("Parent1_name".into(), Parent1));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_1_event_writer.send(ParentEvent::delete("Parent1_name".into(), Parent1));
+                    parent_1_event_writer.send(CudEvent::delete_parent("Parent1_name".into(), Parent1));
                 }
             });
 
@@ -68,13 +68,13 @@ fn interaction_panel(
             ui.label("Parent 2");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_2_event_writer.send(ParentEvent::create("Parent2_name".into(), Parent2));
+                    parent_2_event_writer.send(CudEvent::create_parent("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_2_event_writer.send(ParentEvent::update("Parent2_name".into(), Parent2));
+                    parent_2_event_writer.send(CudEvent::update_parent("Parent2_name".into(), Parent2));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_2_event_writer.send(ParentEvent::delete("Parent2_name".into(), Parent2));
+                    parent_2_event_writer.send(CudEvent::delete_parent("Parent2_name".into(), Parent2));
                 }
             });
 

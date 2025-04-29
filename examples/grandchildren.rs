@@ -33,15 +33,12 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
-        .add_event::<ParentEvent<Building, String>>()
-        .add_event::<ChildEvent<Level, String>>()
-        .add_event::<ChildEvent<Room, String>>()
-        .add_systems(Update, cud_parent_component::<Building, String>)
-        .add_systems(
-            Update,
-            cud_child_component::<Level, String>,
-        )
-        .add_systems(Update, cud_child_component::<Room, String>)
+        .add_event::<CudEvent<Building, String>>()
+        .add_event::<CudEvent<Level, String>>()
+        .add_event::<CudEvent<Room, String>>()
+        .add_systems(Update, cud_bundle::<Building, String>)
+        .add_systems(Update, cud_bundle::<Level, String>)
+        .add_systems(Update, cud_bundle::<Room, String>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
@@ -50,9 +47,9 @@ fn main() {
 
 fn interaction_panel(
     mut contexts: EguiContexts,
-    mut building_event_writer: EventWriter<ParentEvent<Building, String>>,
-    mut level_event_writer: EventWriter<ChildEvent<Level, String>>,
-    mut room_event_writer: EventWriter<ChildEvent<Room, String>>,
+    mut building_event_writer: EventWriter<CudEvent<Building, String>>,
+    mut level_event_writer: EventWriter<CudEvent<Level, String>>,
+    mut room_event_writer: EventWriter<CudEvent<Room, String>>,
 ) {
     let ctx = contexts.ctx_mut();
 
@@ -62,13 +59,13 @@ fn interaction_panel(
             ui.label("Building Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add building").clicked() {
-                    building_event_writer.send(ParentEvent::create("Building".into(), Building));
+                    building_event_writer.send(CudEvent::create_parent("Building".into(), Building));
                 }
                 if ui.button("Modify building").clicked() {
-                    building_event_writer.send(ParentEvent::update("Building".into(), Building));
+                    building_event_writer.send(CudEvent::update_parent("Building".into(), Building));
                 }
                 if ui.button("Remove building").clicked() {
-                    building_event_writer.send(ParentEvent::delete("Building".into(), Building));
+                    building_event_writer.send(CudEvent::delete_parent("Building".into(), Building));
                 }
             });
 
@@ -77,21 +74,21 @@ fn interaction_panel(
             ui.label("Level Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add level").clicked() {
-                    level_event_writer.send(ChildEvent::create(
+                    level_event_writer.send(CudEvent::create_child(
                         "Building".into(),
                         "Level".into(),
                         Level,
                     ));
                 }
                 if ui.button("Modify level").clicked() {
-                    level_event_writer.send(ChildEvent::update(
+                    level_event_writer.send(CudEvent::update_child(
                         "Building".into(),
                         "Level".into(),
                         Level,
                     ));
                 }
                 if ui.button("Remove level").clicked() {
-                    level_event_writer.send(ChildEvent::delete(
+                    level_event_writer.send(CudEvent::delete_child(
                         "Building".into(),
                         "Level".into(),
                         Level,
@@ -104,13 +101,13 @@ fn interaction_panel(
             ui.label("Room Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add room").clicked() {
-                    room_event_writer.send(ChildEvent::create("Level".into(), "Room".into(), Room));
+                    room_event_writer.send(CudEvent::create_child("Level".into(), "Room".into(), Room));
                 }
                 if ui.button("Modify room").clicked() {
-                    room_event_writer.send(ChildEvent::update("Level".into(), "Room".into(), Room));
+                    room_event_writer.send(CudEvent::update_child("Level".into(), "Room".into(), Room));
                 }
                 if ui.button("Remove room").clicked() {
-                    room_event_writer.send(ChildEvent::delete("Level".into(), "Room".into(), Room));
+                    room_event_writer.send(CudEvent::delete_child("Level".into(), "Room".into(), Room));
                 }
             });
 

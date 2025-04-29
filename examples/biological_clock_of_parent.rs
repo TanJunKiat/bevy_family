@@ -36,13 +36,10 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
-        .add_event::<ParentEvent<Building, String>>()
-        .add_event::<ChildEvent<Level, String>>()
-        .add_systems(Update, cud_parent_component::<Building, String>)
-        .add_systems(
-            Update,
-            cud_child_component::<Level, String>,
-        )
+        .add_event::<CudEvent<Building, String>>()
+        .add_event::<CudEvent<Level, String>>()
+        .add_systems(Update, cud_bundle::<Building, String>)
+        .add_systems(Update, cud_bundle::<Level, String>)
         .add_systems(Update, refresh_by_parent_lifetime::<Building, Level>)
         .add_plugins(EguiPlugin)
         .add_systems(Startup, spawn_parent)
@@ -51,8 +48,8 @@ fn main() {
         .run();
 }
 
-fn spawn_parent(mut parent_event_writer: EventWriter<ParentEvent<Building, String>>) {
-    parent_event_writer.send(ParentEvent::create(
+fn spawn_parent(mut parent_event_writer: EventWriter<CudEvent<Building, String>>) {
+    parent_event_writer.send(CudEvent::create_parent(
         "Building".into(),
         Building(std::time::Duration::from_secs(5)),
     ));
@@ -60,7 +57,7 @@ fn spawn_parent(mut parent_event_writer: EventWriter<ParentEvent<Building, Strin
 
 fn interaction_panel(
     mut contexts: EguiContexts,
-    mut child_event_writer: EventWriter<ChildEvent<Level, String>>,
+    mut child_event_writer: EventWriter<CudEvent<Level, String>>,
 ) {
     let ctx = contexts.ctx_mut();
 
@@ -70,7 +67,7 @@ fn interaction_panel(
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
-                    child_event_writer.send(ChildEvent::create(
+                    child_event_writer.send(CudEvent::create_child(
                         "Building".into(),
                         "Level".into(),
                         Level,

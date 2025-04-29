@@ -33,8 +33,8 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
-        .add_event::<ParentEvent<Building, String>>()
-        .add_systems(Update, cud_parent_component::<Building, String>)
+        .add_event::<CudEvent<Building, String>>()
+        .add_systems(Update, cud_bundle::<Building, String>)
         .add_systems(Update, refresh_by_own_lifetime::<Building>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
@@ -44,7 +44,7 @@ fn main() {
 
 fn interaction_panel(
     mut contexts: EguiContexts,
-    mut parent_event_writer: EventWriter<ParentEvent<Building, String>>,
+    mut parent_event_writer: EventWriter<CudEvent<Building, String>>,
 ) {
     let ctx = contexts.ctx_mut();
 
@@ -54,7 +54,7 @@ fn interaction_panel(
             ui.label("Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent::create(
+                    parent_event_writer.send(CudEvent::create_parent(
                         "Building".into(),
                         Building(std::time::Duration::from_secs(5)),
                     ));

@@ -30,13 +30,10 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<String>::default())
-        .add_event::<ParentEvent<Building, String>>()
-        .add_event::<ChildEvent<Level, String>>()
-        .add_systems(Update, cud_parent_component::<Building, String>)
-        .add_systems(
-            Update,
-            cud_child_component::<Level, String>,
-        )
+        .add_event::<CudEvent<Building, String>>()
+        .add_event::<CudEvent<Level, String>>()
+        .add_systems(Update, cud_bundle::<Building, String>)
+        .add_systems(Update, cud_bundle::<Level, String>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
@@ -45,8 +42,8 @@ fn main() {
 
 fn interaction_panel(
     mut contexts: EguiContexts,
-    mut parent_event_writer: EventWriter<ParentEvent<Building, String>>,
-    mut child_event_writer: EventWriter<ChildEvent<Level, String>>,
+    mut parent_event_writer: EventWriter<CudEvent<Building, String>>,
+    mut child_event_writer: EventWriter<CudEvent<Level, String>>,
 ) {
     let ctx = contexts.ctx_mut();
 
@@ -56,13 +53,13 @@ fn interaction_panel(
             ui.label("Parent Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent::create("Building".into(), Building));
+                    parent_event_writer.send(CudEvent::create_parent("Building".into(), Building));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_event_writer.send(ParentEvent::update("Building".into(), Building));
+                    parent_event_writer.send(CudEvent::update_parent("Building".into(), Building));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_event_writer.send(ParentEvent::delete("Building".into(), Building));
+                    parent_event_writer.send(CudEvent::delete_parent("Building".into(), Building));
                 }
             });
 
@@ -71,28 +68,28 @@ fn interaction_panel(
             ui.label("Child Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add child").clicked() {
-                    child_event_writer.send(ChildEvent::create(
+                    child_event_writer.send(CudEvent::create_child(
                         "Building".into(),
                         "Level".into(),
                         Level,
                     ));
                 }
                 if ui.button("Create or modify child").clicked() {
-                    child_event_writer.send(ChildEvent::create_or_modify(
+                    child_event_writer.send(CudEvent::create_or_modify_child(
                         "Building".into(),
                         "Level".into(),
                         Level,
                     ));
                 }
                 if ui.button("Modify child").clicked() {
-                    child_event_writer.send(ChildEvent::update(
+                    child_event_writer.send(CudEvent::update_child(
                         "Building".into(),
                         "Level".into(),
                         Level,
                     ));
                 }
                 if ui.button("Remove child").clicked() {
-                    child_event_writer.send(ChildEvent::delete(
+                    child_event_writer.send(CudEvent::delete_child(
                         "Building".into(),
                         "Level".into(),
                         Level,

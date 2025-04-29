@@ -27,8 +27,8 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FamilyPlugin::<Uuid>::default())
-        .add_event::<ParentEvent<Building, Uuid>>()
-        .add_systems(Update, cud_parent_component::<Building, Uuid>)
+        .add_event::<CudEvent<Building, Uuid>>()
+        .add_systems(Update, cud_bundle::<Building, Uuid>)
         .add_plugins(EguiPlugin)
         .add_systems(Update, interaction_panel)
         .add_systems(Update, lineage_panel)
@@ -52,7 +52,7 @@ impl Default for UuidResource {
 
 fn interaction_panel(
     mut contexts: EguiContexts,
-    mut parent_event_writer: EventWriter<ParentEvent<Building, Uuid>>,
+    mut parent_event_writer: EventWriter<CudEvent<Building, Uuid>>,
     mut uuid_resource: Local<UuidResource>,
 ) {
     let ctx = contexts.ctx_mut();
@@ -82,13 +82,13 @@ fn interaction_panel(
             ui.label("Interaction");
             ui.horizontal(|ui| {
                 if ui.button("Add parent").clicked() {
-                    parent_event_writer.send(ParentEvent::create(uuid_resource.uuid, Building));
+                    parent_event_writer.send(CudEvent::create_parent(uuid_resource.uuid, Building));
                 }
                 if ui.button("Modify parent").clicked() {
-                    parent_event_writer.send(ParentEvent::update(uuid_resource.uuid, Building));
+                    parent_event_writer.send(CudEvent::update_parent(uuid_resource.uuid, Building));
                 }
                 if ui.button("Remove parent").clicked() {
-                    parent_event_writer.send(ParentEvent::delete(uuid_resource.uuid, Building));
+                    parent_event_writer.send(CudEvent::delete_parent(uuid_resource.uuid, Building));
                 }
             });
 
